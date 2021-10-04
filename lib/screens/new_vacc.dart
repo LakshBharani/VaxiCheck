@@ -15,14 +15,37 @@ class NewVaccinePage extends StatefulWidget {
 }
 
 class _NewVaccinePageState extends State<NewVaccinePage> {
-  String currentDate =
-      DateFormat('yyyy-MM-dd – kk:mm:ss').format(DateTime.now());
+  String message = "Vaccine record saved";
+
+  void _showToast(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.check_circle_rounded,
+              color: Colors.greenAccent,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(message),
+          ],
+        ),
+        action: SnackBarAction(
+            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
+
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 
   String vaccine = '';
-  int doses = 0;
+  String doses = '';
   @override
   Widget build(BuildContext context) {
     return loading
@@ -65,7 +88,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             val!.isEmpty ? 'Enter number of doses' : null,
                         onChanged: (val) {
                           setState(() {
-                            doses = int.parse(val);
+                            doses = (val);
                           });
                         },
                       ),
@@ -85,20 +108,23 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             firestoreInstance
                                 .collection("users")
                                 .doc(firebaseUser?.uid)
+                                .collection("Vaccines")
+                                .doc(vaccine.toLowerCase())
                                 .set({
-                              vaccine: {
-                                "vaccName": vaccine,
-                                "date": currentDate,
-                                "doses": doses,
-                                "searchKey":
-                                    vaccine.substring(0, 1).toUpperCase(),
-                              }
-                            }, SetOptions(merge: true)).then((_) {
+                              "vaccName":
+                                  vaccine.substring(0, 1).toUpperCase() +
+                                      vaccine.substring(1).toLowerCase(),
+                              "date": currentDate,
+                              "doses": doses,
+                              "searchKey":
+                                  vaccine.substring(0, 1).toUpperCase(),
+                            }).then((_) {
                               print("success!");
                               Navigator.pop(context);
                               setState(() {
                                 loading = false;
                               });
+                              _showToast(context);
                             });
                           }
                         },

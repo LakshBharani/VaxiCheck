@@ -22,6 +22,28 @@ class _SignInState extends State<SignIn> {
   String password = '';
   String error = '';
 
+  void _showToast(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error,
+              color: Colors.red,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(error),
+          ],
+        ),
+        action: SnackBarAction(
+            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return loading
@@ -100,23 +122,14 @@ class _SignInState extends State<SignIn> {
                                 .signInWithEmailAndPassword(email, password);
                             if (result == null) {
                               setState(() {
-                                error = 'Please check Email and Password';
+                                error = 'Incorrect Email or Password';
                                 loading = false;
                               });
+                              _showToast(context);
                             }
                           }
                         },
                         child: Text("Sign In"),
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      Text(
-                        error,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14,
-                        ),
                       ),
                     ],
                   ),

@@ -22,6 +22,28 @@ class _RegisterState extends State<Register> {
   String password = '';
   String error = '';
 
+  void _showToast(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.error,
+              color: Colors.red,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(error),
+          ],
+        ),
+        action: SnackBarAction(
+            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return loading
@@ -101,23 +123,17 @@ class _RegisterState extends State<Register> {
                                 .resgisterWithEmailAndPassword(email, password);
                             if (result == null) {
                               setState(() {
-                                error = 'Please supply a valid email';
+                                error = 'Please enter a valid email';
                                 loading = false;
                               });
                             }
                           }
                         },
+                        
                         child: Text("Register"),
                       ),
                       SizedBox(
                         height: 12,
-                      ),
-                      Text(
-                        error,
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14,
-                        ),
                       ),
                     ],
                   ),
