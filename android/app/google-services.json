@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "864652759770",
+    "project_id": "vaxicheck-becf6",
+    "storage_bucket": "vaxicheck-becf6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864652759770:android:c7242a53f73d56d6ef8be3",
+        "android_client_info": {
+          "package_name": "com.laksh.vaxicheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864652759770-ob5kjqu50m9nmvjg3p3u8dm26n5r771e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-nuSw1CE0cU11c2RDNPUxMaA1MgEb_7Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864652759770-ob5kjqu50m9nmvjg3p3u8dm26n5r771e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
