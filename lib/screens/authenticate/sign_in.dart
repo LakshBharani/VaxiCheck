@@ -29,7 +29,7 @@ class _SignInState extends State<SignIn> {
         content: Row(
           children: [
             Icon(
-              Icons.error,
+              Icons.cancel,
               color: Colors.red,
             ),
             SizedBox(
@@ -81,8 +81,10 @@ class _SignInState extends State<SignIn> {
                         height: 20,
                       ),
                       TextFormField(
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Email'),
+                        decoration: textInputDecoration.copyWith(
+                          hintText: 'Email',
+                          prefixIcon: Icon(Icons.email_rounded),
+                        ),
                         validator: (val) =>
                             val!.isEmpty ? 'Enter an email' : null,
                         onChanged: (val) {
@@ -95,8 +97,10 @@ class _SignInState extends State<SignIn> {
                         height: 20,
                       ),
                       TextFormField(
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Password'),
+                        decoration: textInputDecoration.copyWith(
+                          hintText: 'Password',
+                          prefixIcon: Icon(Icons.lock),
+                        ),
                         validator: (val) => val!.length < 6
                             ? 'Password must contain 6 or more characters'
                             : null,

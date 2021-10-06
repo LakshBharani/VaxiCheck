@@ -1,14 +1,14 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/rendering.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
 import 'package:vaxicheck/services/auth.dart';
+import 'package:vaxicheck/services/searchservice.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,213 +18,406 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  var queryResultSet = [];
+  var tempSearchStore = [];
   bool isSearching = false;
   final AuthService _auth = AuthService();
   var firebaseUser = FirebaseAuth.instance.currentUser;
 
+  initiateSearch(value) {
+    if (value.length == 0) {
+      setState(() {
+        queryResultSet = [];
+        tempSearchStore = [];
+      });
+    }
+    var capitalizedValue =
+        value.substring(0, 1).toUpperCase() + value.substring(1);
+
+    if (queryResultSet.length == 0 && value.length == 1) {
+      SearchService().searchByName(value).then((QuerySnapshot docs) {
+        for (int i = 0; i < docs.docs.length; ++i) {
+          queryResultSet.add(docs.docs[i].data());
+        }
+      });
+    } else {
+      tempSearchStore = [];
+      queryResultSet.forEach((element) {
+        if (element['vaccName'].startsWith(capitalizedValue)) {
+          setState(() {
+            tempSearchStore.add(element);
+          });
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[800],
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => NewVaccinePage()));
-        },
-        child: Icon(Icons.add),
-      ),
-      backgroundColor: Colors.blue[50],
-      appBar: AppBar(
-        backgroundColor: Colors.blue[800],
-        title: !isSearching
-            ? Text("VaxiCheck")
-            : TextField(
-                // onChanged: (val) {
-                //   initiateSearch(val);
-                // },
-                style: TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  icon: Icon(
-                    Icons.search_rounded,
-                    color: Colors.white,
-                  ),
-                  hintText: 'Search a vaccine record',
-                  hintStyle: TextStyle(color: Colors.white),
-                ),
-              ),
-        actions: [
-          isSearching
-              ? IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isSearching = !isSearching;
-                    });
-                  },
-                  icon: Icon(Icons.cancel),
-                )
-              : IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isSearching = !isSearching;
-                    });
-                  },
-                  icon: Icon(Icons.search_rounded),
-                ),
-          PopupMenuButton(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                onTap: () async {
-                  await _auth.signOut();
-                },
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.blue[900]),
-                    SizedBox(
-                      width: 10,
+    return !isSearching
+        ? Scaffold(
+            drawer: Drawer(),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Colors.blue[800],
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => NewVaccinePage()));
+              },
+              child: Icon(Icons.add),
+            ),
+            backgroundColor: Colors.blue[50],
+            appBar: AppBar(
+              backgroundColor: Colors.blue[800],
+              title: !isSearching
+                  ? Text("VaxiCheck")
+                  : TextField(
+                      onChanged: (val) {
+                        initiateSearch(val);
+                      },
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        icon: Icon(
+                          Icons.search_rounded,
+                          color: Colors.white,
+                        ),
+                        hintText: 'Search a vaccine record',
+                        hintStyle: TextStyle(color: Colors.white),
+                      ),
                     ),
-                    Text(
-                      "Logout",
-                      style: TextStyle(color: Colors.blue[900]),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("users")
-            .doc(firebaseUser?.uid)
-            .collection('Vaccines')
-            .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return ListView(
-            children: snapshot.data!.docs.map((document) {
-              return Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 1.08,
-                  height: MediaQuery.of(context).size.height / 7.5,
-                  child: Card(
-                    elevation: 10,
-                    color: Colors.white,
-                    shadowColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      child: Stack(
+              actions: [
+                isSearching
+                    ? IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isSearching = !isSearching;
+                          });
+                        },
+                        icon: Icon(Icons.cancel),
+                      )
+                    : IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isSearching = !isSearching;
+                          });
+                        },
+                        icon: Icon(Icons.search_rounded),
+                      ),
+                PopupMenuButton(
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      onTap: () async {
+                        await _auth.signOut();
+                      },
+                      child: Row(
                         children: [
-                          Column(
-                            children: [
-                              Center(
-                                child: Text(
-                                  document['vaccName'],
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ],
+                          Icon(Icons.logout, color: Colors.blue[900]),
+                          SizedBox(
+                            width: 10,
                           ),
-                          Positioned.fill(
-                            child: Text("Date : " + document['date']),
-                            left: 10,
-                            top: 30,
-                          ),
-                          Positioned.fill(
-                            child: Text("Doses : " + document['doses']),
-                            left: 10,
-                            top: 53,
-                          ),
-                          Positioned(
-                            child: FlatButton(
-                              height: MediaQuery.of(context).size.height / 7.5,
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    title: Text('Delete?'),
-                                    content: Container(
-                                      height: 50,
-                                      child: Row(
-                                        // ignore: prefer_const_literals_to_create_immutables
-                                        children: [
-                                          Text(
-                                              'This will delete the current record'),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      CupertinoDialogAction(
-                                        child: FlatButton(
-                                          color: Colors.redAccent,
-                                          onPressed: () {
-                                            FirebaseFirestore.instance
-                                                .collection("users")
-                                                .doc(firebaseUser?.uid)
-                                                .collection('Vaccines')
-                                                .doc(document['vaccName']
-                                                    .toString()
-                                                    .toLowerCase())
-                                                .delete();
-                                            Navigator.of(context).pop(false);
-                                          },
-                                          child: Text(
-                                            'Delete',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 15),
-                                          ),
-                                        ),
-                                      ),
-                                      CupertinoDialogAction(
-                                        child: FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop(false);
-                                          },
-                                          child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                                color: Colors.blue,
-                                                fontSize: 15),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    elevation: 24,
-                                  ),
-                                );
-                              },
-                              child: Icon(
-                                Icons.delete,
-                                size: 30,
-                                color: Colors.red,
-                              ),
-                            ),
-                            right: 0,
-                            top: -10,
+                          Text(
+                            "Logout",
+                            style: TextStyle(color: Colors.blue[900]),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              );
-            }).toList(),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("users")
+                    .doc(firebaseUser?.uid)
+                    .collection('vaccines')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return ListView(
+                    children: snapshot.data!.docs.map(
+                      (document) {
+                        return Card(
+                          elevation: 10,
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 1),
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Container(
+                                    child: ExpansionTile(
+                                      tilePadding: EdgeInsets.all(10),
+                                      backgroundColor: Colors.white,
+                                      collapsedBackgroundColor: Colors.white,
+                                      textColor: Colors.black,
+                                      collapsedTextColor: Colors.black,
+                                      title: Column(
+                                        children: [
+                                          Text(
+                                            document['vaccName'],
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Date : " + document['date'],
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            "Doses : " + document['doses'],
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Container(
+                                              height: 150,
+                                              color: Colors.amber[100],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 10,
+                                                          right: 10,
+                                                          bottom: 5),
+                                                  child: FlatButton(
+                                                    color: Colors.red,
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (_) =>
+                                                            AlertDialog(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                          ),
+                                                          title:
+                                                              Text('Delete?'),
+                                                          content: Container(
+                                                            child: Text(
+                                                                'This will delete the current record'),
+                                                          ),
+                                                          actions: [
+                                                            FlatButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false);
+                                                              },
+                                                              child: Text(
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .blue,
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ),
+                                                            FlatButton(
+                                                              color: Colors.red,
+                                                              onPressed: () {
+                                                                FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        "users")
+                                                                    .doc(firebaseUser
+                                                                        ?.uid)
+                                                                    .collection(
+                                                                        'vaccines')
+                                                                    .doc(document[
+                                                                            'vaccName']
+                                                                        .toString()
+                                                                        .toLowerCase())
+                                                                    .delete();
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false);
+                                                              },
+                                                              child: Text(
+                                                                'Delete',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        15),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                          ],
+                                                          elevation: 24,
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  );
+                },
+              ),
+            ),
+          )
+        : MaterialApp(
+            home: Scaffold(
+              drawer: Drawer(),
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.blue[800],
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => NewVaccinePage()));
+                },
+                child: Icon(Icons.add),
+              ),
+              backgroundColor: Colors.blue[50],
+              appBar: AppBar(
+                backgroundColor: Colors.blue[800],
+                title: !isSearching
+                    ? Text("VaxiCheck")
+                    : TextField(
+                        onChanged: (val) {
+                          initiateSearch(val);
+                        },
+                        style: TextStyle(color: Colors.white),
+                        cursorColor: Colors.white,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          icon: Icon(
+                            Icons.search_rounded,
+                            color: Colors.white,
+                          ),
+                          hintText: 'Search a vaccine record',
+                          hintStyle: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                actions: [
+                  isSearching
+                      ? IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isSearching = !isSearching;
+                            });
+                          },
+                          icon: Icon(Icons.cancel),
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isSearching = !isSearching;
+                            });
+                          },
+                          icon: Icon(Icons.search_rounded),
+                        ),
+                  PopupMenuButton(
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        onTap: () async {
+                          await _auth.signOut();
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.blue[900]),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "Logout",
+                              style: TextStyle(color: Colors.blue[900]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              body: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
+                  primary: false,
+                  shrinkWrap: true,
+                  children: tempSearchStore.map((element) {
+                    return buildResultCard(element);
+                  }).toList()),
+            ),
           );
-        },
-      ),
-    );
   }
+}
+
+Widget buildResultCard(data) {
+  return Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    elevation: 2,
+    child: Container(
+      child: Center(
+        child: Text(
+          data['vaccName'],
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
+      ),
+    ),
+  );
 }

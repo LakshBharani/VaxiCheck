@@ -19,6 +19,8 @@ class _RegisterState extends State<Register> {
   bool loading = false;
 
   String email = '';
+  String pwd1 = '';
+  String pwd2 = '';
   String password = '';
   String error = '';
 
@@ -29,7 +31,7 @@ class _RegisterState extends State<Register> {
         content: Row(
           children: [
             Icon(
-              Icons.error,
+              Icons.cancel,
               color: Colors.red,
             ),
             SizedBox(
@@ -82,8 +84,10 @@ class _RegisterState extends State<Register> {
                         height: 20,
                       ),
                       TextFormField(
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Email'),
+                        decoration: textInputDecoration.copyWith(
+                          hintText: 'Email',
+                          prefixIcon: Icon(Icons.email_rounded),
+                        ),
                         validator: (val) =>
                             val!.isEmpty ? 'Enter an email' : null,
                         onChanged: (val) {
@@ -96,14 +100,34 @@ class _RegisterState extends State<Register> {
                         height: 20,
                       ),
                       TextFormField(
-                        decoration:
-                            textInputDecoration.copyWith(hintText: 'Password'),
+                        decoration: textInputDecoration.copyWith(
+                          hintText: 'Password',
+                          prefixIcon: Icon(Icons.lock),
+                        ),
                         validator: (val) => val!.length < 6
                             ? 'Password must contain 6 or more characters'
                             : null,
                         obscureText: true,
                         onChanged: (val) {
                           setState(() {
+                            pwd1 = val;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        decoration: textInputDecoration.copyWith(
+                          hintText: 'Retype Password',
+                          prefixIcon: Icon(Icons.lock),
+                        ),
+                        validator: (val) =>
+                            pwd1 != pwd2 ? "Passwords don't match" : null,
+                        obscureText: true,
+                        onChanged: (val) {
+                          setState(() {
+                            pwd2 = val;
                             password = val;
                           });
                         },
@@ -129,12 +153,12 @@ class _RegisterState extends State<Register> {
                             }
                           }
                         },
-                        
                         child: Text("Register"),
                       ),
                       SizedBox(
                         height: 12,
                       ),
+                      Text(error),
                     ],
                   ),
                 ),

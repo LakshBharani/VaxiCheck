@@ -39,7 +39,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
     );
   }
 
-  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
@@ -108,12 +108,12 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             firestoreInstance
                                 .collection("users")
                                 .doc(firebaseUser?.uid)
-                                .collection("Vaccines")
+                                .collection("vaccines")
                                 .doc(vaccine.toLowerCase())
                                 .set({
                               "vaccName":
                                   vaccine.substring(0, 1).toUpperCase() +
-                                      vaccine.substring(1).toLowerCase(),
+                                      vaccine.substring(1),
                               "date": currentDate,
                               "doses": doses,
                               "searchKey":

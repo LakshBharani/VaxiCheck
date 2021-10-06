@@ -31,18 +31,6 @@ class AuthService {
       print(e.toString());
       return null;
     }
-
-    var firebaseUser = FirebaseAuth.instance.currentUser;
-
-    firestoreInstance.collection("users").doc(firebaseUser?.uid).set({
-      //   "vaccName": {
-      //     "date": currentDate,
-      //     "doses": 0,
-      //     "searchKey": "null",
-      //   }
-      // }).then((_) {
-      //   print("success!");
-    });
   }
 
 // sign in with email and pwd
