@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label
+// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +38,9 @@ class _HomeState extends State<Home> {
       SearchService().searchByName(value).then((QuerySnapshot docs) {
         for (int i = 0; i < docs.docs.length; ++i) {
           queryResultSet.add(docs.docs[i].data());
+          setState(() {
+            tempSearchStore.add(queryResultSet[i]);
+          });
         }
       });
     } else {
@@ -100,6 +103,8 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           setState(() {
                             isSearching = !isSearching;
+                            queryResultSet = [];
+                            tempSearchStore = [];
                           });
                         },
                         icon: Icon(Icons.search_rounded),
@@ -389,33 +394,58 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              body: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 4,
-                  mainAxisSpacing: 4,
-                  primary: false,
-                  shrinkWrap: true,
-                  children: tempSearchStore.map((element) {
-                    return buildResultCard(element);
-                  }).toList()),
+              body: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GridView.count(
+                    childAspectRatio: (1 / .65),
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                    primary: false,
+                    shrinkWrap: true,
+                    children: tempSearchStore.map((element) {
+                      return buildResultCard(element);
+                    }).toList()),
+              ),
             ),
           );
   }
 }
 
+// search result card widget
 Widget buildResultCard(data) {
   return Card(
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     elevation: 2,
     child: Container(
-      child: Center(
-        child: Text(
-          data['vaccName'],
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-          ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 15, 15, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                data['vaccName'],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Record Found',
+              style: TextStyle(color: Colors.green[700]),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Text('Go back to home for more details'),
+          ],
         ),
       ),
     ),
