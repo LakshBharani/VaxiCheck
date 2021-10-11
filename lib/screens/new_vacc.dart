@@ -1,11 +1,18 @@
-// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_print
+// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_print,prefer_const_literals_to_create_immutables
 
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:vaxicheck/shared/constants.dart';
 import 'package:vaxicheck/shared/loading.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 
 class NewVaccinePage extends StatefulWidget {
   const NewVaccinePage({Key? key}) : super(key: key);
@@ -39,11 +46,14 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
     );
   }
 
-  String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+  String currentDate = DateFormat('dd-MMM-yy').format(DateTime.now());
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
   bool isImageAdded = false;
+  var firebaseUser = FirebaseAuth.instance.currentUser;
+
+  File? file;
 
   String vaccine = '';
   String doses = '';
@@ -102,36 +112,15 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                           Container(
                             height: 150,
                             width: 290,
-                            color: Colors.amber[50],
+                            color: Colors.white,
                             child: isImageAdded
-                                ? MaterialButton(
-                                    onPressed: () {},
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [],
-                                    ),
-                                  )
-                                : MaterialButton(
-                                    onPressed: () {},
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      // ignore: prefer_const_literals_to_create_immutables
-                                      children: [
-                                        Icon(
-                                          Icons.camera_alt_rounded,
-                                          color: Colors.blue[800],
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text('Click here to upload image'),
-                                      ],
+                                ? SizedBox()
+                                : SizedBox(
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.camera_alt_rounded,
+                                        color: Colors.blue[800],
+                                      ),
                                     ),
                                   ),
                           ),
@@ -146,20 +135,17 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                 color: Colors.blue[800],
                                 textColor: Colors.white,
                                 onPressed: () {
-                                  setState(() {
-                                    isImageAdded = false;
-                                  });
+                                  selectFile();
                                 },
                                 child: Row(
-                                  // ignore: prefer_const_literals_to_create_immutables
                                   children: [
                                     Icon(
-                                      Icons.replay_circle_filled_outlined,
+                                      Icons.upload_file_rounded,
                                     ),
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Text("Retake Image"),
+                                    Text("Upload Image"),
                                   ],
                                 ),
                               ),
@@ -175,8 +161,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                     setState(() {
                                       loading = true;
                                     });
-                                    var firebaseUser =
-                                        FirebaseAuth.instance.currentUser;
+                                    uploadFile();
                                     firestoreInstance
                                         .collection("users")
                                         .doc(firebaseUser?.uid)
@@ -191,7 +176,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                       "doses": doses,
                                       "searchKey":
                                           vaccine.substring(0, 1).toUpperCase(),
-                                      "imageUrl": imageUrl
+                                      "imageUrl": imageUrl,
                                     }).then((_) {
                                       print("success!");
                                       Navigator.pop(context);
@@ -203,7 +188,6 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                   }
                                 },
                                 child: Row(
-                                  // ignore: prefer_const_literals_to_create_immutables
                                   children: [
                                     Text("Submit"),
                                     SizedBox(
@@ -228,5 +212,39 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
               ),
             ),
           );
+  }
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    if (result == null) {
+      setState(() {
+        isImageAdded = false;
+      });
+    } else {
+      final path = result.files.single.path!;
+      setState(() {
+        isImageAdded = true;
+        file = File(path);
+      });
+      print(file);
+    }
+  }
+
+  Future uploadFile() async {
+    var uid = firebaseUser?.uid;
+    if (file == null) {
+      return;
+    }
+
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("images/")
+        .child("$uid/")
+        .child(vaccine);
+    await ref.putFile(file!);
+    setState(() {
+      imageUrl = ref.getDownloadURL().toString();
+    });
+    print("image Url:" + imageUrl);
   }
 }

@@ -163,6 +163,7 @@ class _HomeState extends State<Home> {
                                 Center(
                                   child: Container(
                                     child: ExpansionTile(
+                                      key: GlobalKey(),
                                       tilePadding: EdgeInsets.all(10),
                                       backgroundColor: Colors.white,
                                       collapsedBackgroundColor: Colors.white,
