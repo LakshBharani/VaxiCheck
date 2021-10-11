@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -21,6 +24,8 @@ class _HomeState extends State<Home> {
   var queryResultSet = [];
   var tempSearchStore = [];
   bool isSearching = false;
+  File? file;
+
   final AuthService _auth = AuthService();
   var firebaseUser = FirebaseAuth.instance.currentUser;
 
@@ -157,7 +162,7 @@ class _HomeState extends State<Home> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 1),
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                             child: Column(
                               children: [
                                 Center(
@@ -261,6 +266,7 @@ class _HomeState extends State<Home> {
                                                             FlatButton(
                                                               color: Colors.red,
                                                               onPressed: () {
+                                                                // delete vaccine record
                                                                 FirebaseFirestore
                                                                     .instance
                                                                     .collection(
@@ -277,6 +283,23 @@ class _HomeState extends State<Home> {
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop(false);
+
+                                                                // delete image from storage
+                                                                var uid =
+                                                                    firebaseUser
+                                                                        ?.uid;
+                                                                Reference ref = FirebaseStorage
+                                                                    .instance
+                                                                    .ref()
+                                                                    .child(
+                                                                        "images/")
+                                                                    .child(
+                                                                        "$uid/")
+                                                                    .child(document[
+                                                                            'vaccName']
+                                                                        .toString()
+                                                                        .toLowerCase());
+                                                                ref.delete();
                                                               },
                                                               child: Text(
                                                                 'Delete',

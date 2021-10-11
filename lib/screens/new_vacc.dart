@@ -3,16 +3,15 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:vaxicheck/shared/constants.dart';
 import 'package:vaxicheck/shared/loading.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 
 class NewVaccinePage extends StatefulWidget {
   const NewVaccinePage({Key? key}) : super(key: key);
@@ -46,7 +45,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
     );
   }
 
-  String currentDate = DateFormat('dd-MMM-yy').format(DateTime.now());
+  String currentDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
@@ -162,6 +161,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                       loading = true;
                                     });
                                     uploadFile();
+
                                     firestoreInstance
                                         .collection("users")
                                         .doc(firebaseUser?.uid)
@@ -240,11 +240,13 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
         .ref()
         .child("images/")
         .child("$uid/")
-        .child(vaccine);
+        .child(vaccine.toLowerCase());
     await ref.putFile(file!);
-    setState(() {
-      imageUrl = ref.getDownloadURL().toString();
-    });
+    if (mounted) {
+      setState(() async {
+        imageUrl = await ref.getDownloadURL();
+      });
+    }
     print("image Url:" + imageUrl);
   }
 }
