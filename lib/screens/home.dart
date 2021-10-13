@@ -213,10 +213,15 @@ class _HomeState extends State<Home> {
                                       children: [
                                         Column(
                                           children: [
-                                            Container(
-                                              height: 150,
-                                              color: Colors.amber[100],
-                                            ),
+                                            if (document
+                                                .data()
+                                                .toString()
+                                                .contains('imageUrl'))
+                                              Container(
+                                                color: Colors.amber[100],
+                                                child: Image.network(
+                                                    document['imageUrl']),
+                                              ),
                                             Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,
