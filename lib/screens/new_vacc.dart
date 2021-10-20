@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_print,prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_print,prefer_const_literals_to_create_immutables, invalid_use_of_visible_for_testing_member
 
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +55,8 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
 
   String vaccine = '';
   String doses = '';
-  String imageUrl = '';
+  late String imageUrl;
+  String error = '';
 
   @override
   Widget build(BuildContext context) {
@@ -162,31 +162,32 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                       loading = true;
                                     });
 
-                                    uploadFile();
-
-                                    firestoreInstance
-                                        .collection("users")
-                                        .doc(firebaseUser?.uid)
-                                        .collection("vaccines")
-                                        .doc(vaccine.toLowerCase())
-                                        .set({
-                                      "vaccName": vaccine
-                                              .substring(0, 1)
-                                              .toUpperCase() +
-                                          vaccine.substring(1),
-                                      "date": currentDate,
-                                      "doses": doses,
-                                      "searchKey":
-                                          vaccine.substring(0, 1).toUpperCase(),
-                                      "imageUrl": imageUrl,
-                                    }).then((_) {
-                                      print("success!");
-                                      Navigator.pop(context);
-                                      setState(() {
-                                        loading = false;
-                                      });
-                                      _showToast(context);
-                                    });
+                                    uploadFile().whenComplete(
+                                      () => firestoreInstance
+                                          .collection("users")
+                                          .doc(firebaseUser?.uid)
+                                          .collection("vaccines")
+                                          .doc(vaccine.toLowerCase())
+                                          .set({
+                                        "vaccName": vaccine
+                                                .substring(0, 1)
+                                                .toUpperCase() +
+                                            vaccine.substring(1),
+                                        "date": currentDate,
+                                        "doses": doses,
+                                        "searchKey": vaccine
+                                            .substring(0, 1)
+                                            .toUpperCase(),
+                                        "imageUrl": imageUrl,
+                                      }).then((_) {
+                                        print("success!");
+                                        Navigator.pop(context);
+                                        setState(() {
+                                          loading = false;
+                                        });
+                                        _showToast(context);
+                                      }),
+                                    );
                                   }
                                 },
                                 child: Row(
@@ -217,13 +218,16 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
   }
 
   Future selectFile() async {
-    final result = await FilePicker.platform.pickFiles(allowMultiple: false);
+    var result = await ImagePicker.platform.pickImage(
+      source: ImageSource.camera,
+    );
     if (result == null) {
       setState(() {
         isImageAdded = false;
+        error = "No image selected";
       });
     } else {
-      final path = result.files.single.path!;
+      final path = result.path;
       setState(() {
         isImageAdded = true;
         file = File(path);
@@ -245,9 +249,12 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
         .child(vaccine.toLowerCase());
     await ref.putFile(file!);
     if (mounted) {
-      imageUrl = await ref.getDownloadURL();
+      imageUrl = await ref.getDownloadURL().whenComplete(
+            () => setState(() {
+              isImageAdded = true;
+            }),
+          );
     }
-
     print("image Url:" + imageUrl);
   }
 }

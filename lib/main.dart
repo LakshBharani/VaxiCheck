@@ -17,11 +17,6 @@ Future<void> main() async {
       .activate(webRecaptchaSiteKey: 'recaptcha-v3-site-key');
   runApp(MyApp());
 }
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
-//   runApp(const MyApp());
-// }
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
