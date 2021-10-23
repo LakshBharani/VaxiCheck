@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_print,prefer_const_literals_to_create_immutables, invalid_use_of_visible_for_testing_member
 
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,6 +49,9 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
   bool isImageAdded = false;
+  bool isGallery = true;
+  bool isUploading = true;
+
   var firebaseUser = FirebaseAuth.instance.currentUser;
 
   File? file;
@@ -110,18 +113,34 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             height: 20,
                           ),
                           Container(
-                            height: 150,
+                            height: 200,
                             width: 290,
                             color: Colors.white,
                             child: isImageAdded
-                                ? SizedBox()
-                                : SizedBox(
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.camera_alt_rounded,
-                                        color: Colors.blue[800],
+                                ? Image.network(imageUrl)
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.blue[800],
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        'Please upload an image',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                           ),
                           SizedBox(
@@ -135,17 +154,24 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                 color: Colors.blue[800],
                                 textColor: Colors.white,
                                 onPressed: () {
-                                  selectFile();
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: ((builder) => bottomSheet()),
+                                  );
                                 },
                                 child: Row(
                                   children: [
                                     Icon(
-                                      Icons.upload_file_rounded,
+                                      isImageAdded
+                                          ? Icons.autorenew_rounded
+                                          : Icons.upload_file_rounded,
                                     ),
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Text("Upload Image"),
+                                    isImageAdded
+                                        ? Text("Retake Image")
+                                        : Text("Upload image"),
                                   ],
                                 ),
                               ),
@@ -157,11 +183,11 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                 color: Colors.blue[800],
                                 textColor: Colors.white,
                                 onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
+                                  if (_formKey.currentState!.validate() &&
+                                      isImageAdded) {
                                     setState(() {
                                       loading = true;
                                     });
-
                                     uploadFile().whenComplete(
                                       () => firestoreInstance
                                           .collection("users")
@@ -218,23 +244,57 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
   }
 
   Future selectFile() async {
-    var result = await ImagePicker.platform.pickImage(
-      source: ImageSource.camera,
+    var pickedImage = await ImagePicker.platform.pickImage(
+      source: isGallery ? ImageSource.gallery : ImageSource.camera,
     );
-    if (result == null) {
-      setState(() {
-        isImageAdded = false;
-        error = "No image selected";
-      });
+    if (pickedImage == null) {
     } else {
-      final path = result.path;
+      File? croppedFile = await ImageCropper.cropImage(
+          sourcePath: pickedImage.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.ratio3x2,
+            CropAspectRatioPreset.original,
+            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.ratio16x9
+          ],
+          androidUiSettings: AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          iosUiSettings: IOSUiSettings(
+            minimumAspectRatio: 1.0,
+          ));
+      var path = "";
+      if (croppedFile != null) {
+        setState(() {
+          path = croppedFile.path;
+        });
+      } else {
+        path = pickedImage.path;
+      }
       setState(() {
         isImageAdded = true;
         file = File(path);
       });
       print(file);
+      setState(() {
+        loading = true;
+      });
+      uploadDummyFile().whenComplete(() => loading = false);
     }
+    // _cropImage(pickedImage!.path);
   }
+
+  // _cropImage(filePath) async {
+  //   File? croppedImage = await ImageCropper.cropImage(
+  //     sourcePath: filePath,
+  //     maxWidth: 1080,
+  //     maxHeight: 1080,
+  //   );
+  // }
 
   Future uploadFile() async {
     var uid = firebaseUser?.uid;
@@ -256,5 +316,103 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
           );
     }
     print("image Url:" + imageUrl);
+  }
+
+  Future uploadDummyFile() async {
+    var uid = firebaseUser?.uid;
+
+    if (file == null) {
+      return;
+    }
+
+    if (isUploading == true) {
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child("images/")
+          .child("$uid/")
+          .child("dummyFile");
+      await ref.putFile(file!);
+      if (mounted) {
+        imageUrl = await ref.getDownloadURL().whenComplete(
+              () => setState(() {
+                isImageAdded = true;
+              }),
+            );
+      }
+      print("image Url:" + imageUrl);
+    } else {
+      Reference ref =
+          FirebaseStorage.instance.ref().child("images/").child("dummyFiles/");
+      ref.delete();
+    }
+  }
+
+  Widget bottomSheet() {
+    return Card(
+      child: Container(
+        height: 122,
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.only(top: 20, bottom: 20),
+        child: Column(
+          children: [
+            Text(
+              'Choose Image',
+              style: TextStyle(
+                color: Colors.blue[900],
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FlatButton.icon(
+                  color: Colors.blue[900],
+                  onPressed: () {
+                    setState(() {
+                      isGallery = false;
+                    });
+                    selectFile();
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.camera,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    'Camera',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                FlatButton.icon(
+                  color: Colors.blue[900],
+                  onPressed: () {
+                    setState(() {
+                      isGallery = true;
+                    });
+                    selectFile();
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.image,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    'Gallery',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
