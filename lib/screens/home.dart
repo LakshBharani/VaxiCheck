@@ -217,10 +217,16 @@ class _HomeState extends State<Home> {
                                                     .data()
                                                     .toString()
                                                     .contains('imageUrl'))
-                                                ? Container(
-                                                    color: Colors.amber[100],
-                                                    child: Image.network(
-                                                        document['imageUrl']),
+                                                ? ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                      maxHeight: 125,
+                                                      minHeight: 0,
+                                                    ),
+                                                    child: Container(
+                                                      color: Colors.amber[100],
+                                                      child: Image.network(
+                                                          document['imageUrl']),
+                                                    ),
                                                   )
                                                 : Container(),
                                             Row(

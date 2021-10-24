@@ -21,6 +21,7 @@ class NewVaccinePage extends StatefulWidget {
 
 class _NewVaccinePageState extends State<NewVaccinePage> {
   String message = "Vaccine record saved";
+  String errorMessage = "Please upload an image";
 
   void _showToast(BuildContext context) {
     final scaffold = ScaffoldMessenger.of(context);
@@ -44,13 +45,38 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
     );
   }
 
+  void _showToastError(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.cancel,
+              color: Colors.redAccent,
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Text(errorMessage),
+          ],
+        ),
+        action: SnackBarAction(
+            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
+
   String currentDate = DateFormat('dd MMMM yyyy').format(DateTime.now());
   final firestoreInstance = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
   bool isImageAdded = false;
   bool isGallery = true;
+  bool isDummyFileUsed = false;
   bool isUploading = true;
+  String initValueText = "";
+  String initValueInt = "";
 
   var firebaseUser = FirebaseAuth.instance.currentUser;
 
@@ -84,6 +110,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             height: 20,
                           ),
                           TextFormField(
+                            initialValue: initValueText,
                             decoration: textInputDecoration.copyWith(
                                 hintText: 'Vaccine Name'),
                             validator: (val) =>
@@ -91,6 +118,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             onChanged: (val) {
                               setState(() {
                                 vaccine = val;
+                                initValueText = vaccine;
                               });
                             },
                           ),
@@ -98,6 +126,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             height: 20,
                           ),
                           TextFormField(
+                            initialValue: initValueInt,
                             keyboardType: TextInputType.numberWithOptions(),
                             decoration:
                                 textInputDecoration.copyWith(hintText: 'Doses'),
@@ -106,6 +135,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             onChanged: (val) {
                               setState(() {
                                 doses = (val);
+                                initValueInt = doses;
                               });
                             },
                           ),
@@ -118,7 +148,18 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             color: Colors.white,
                             child: isImageAdded
                                 ? Image.network(imageUrl)
-                                : Column(
+                                :
+                                //  FlatButton(
+                                // color: Colors.white,
+                                // hoverColor: Colors.white,
+                                // onPressed: () {
+                                // showModalBottomSheet(
+                                //   context: context,
+                                //   builder: ((builder) => bottomSheet()),
+                                // );
+                                // },
+                                // child:
+                                Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -142,6 +183,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                       ),
                                     ],
                                   ),
+                            // ),
                           ),
                           SizedBox(
                             height: 25,
@@ -188,32 +230,60 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                     setState(() {
                                       loading = true;
                                     });
-                                    uploadFile().whenComplete(
-                                      () => firestoreInstance
-                                          .collection("users")
-                                          .doc(firebaseUser?.uid)
-                                          .collection("vaccines")
-                                          .doc(vaccine.toLowerCase())
-                                          .set({
-                                        "vaccName": vaccine
+                                    isDummyFileUsed
+                                        ? uploadFile().whenComplete(() =>
+                                            firestoreInstance
+                                                .collection("users")
+                                                .doc(firebaseUser?.uid)
+                                                .collection("vaccines")
+                                                .doc(vaccine.toLowerCase())
+                                                .set({
+                                              "vaccName": vaccine
+                                                      .substring(0, 1)
+                                                      .toUpperCase() +
+                                                  vaccine.substring(1),
+                                              "date": currentDate,
+                                              "doses": doses,
+                                              "searchKey": vaccine
+                                                  .substring(0, 1)
+                                                  .toUpperCase(),
+                                              "imageUrl": imageUrl,
+                                            }).then((_) {
+                                              print("success!");
+                                              Navigator.pop(context);
+                                              setState(() {
+                                                loading = false;
+                                              });
+                                              _showToast(context);
+                                            }))
+                                        : firestoreInstance
+                                            .collection("users")
+                                            .doc(firebaseUser?.uid)
+                                            .collection("vaccines")
+                                            .doc(vaccine.toLowerCase())
+                                            .set({
+                                            "vaccName": vaccine
+                                                    .substring(0, 1)
+                                                    .toUpperCase() +
+                                                vaccine.substring(1),
+                                            "date": currentDate,
+                                            "doses": doses,
+                                            "searchKey": vaccine
                                                 .substring(0, 1)
-                                                .toUpperCase() +
-                                            vaccine.substring(1),
-                                        "date": currentDate,
-                                        "doses": doses,
-                                        "searchKey": vaccine
-                                            .substring(0, 1)
-                                            .toUpperCase(),
-                                        "imageUrl": imageUrl,
-                                      }).then((_) {
-                                        print("success!");
-                                        Navigator.pop(context);
-                                        setState(() {
-                                          loading = false;
-                                        });
-                                        _showToast(context);
-                                      }),
-                                    );
+                                                .toUpperCase(),
+                                            "imageUrl": imageUrl,
+                                          }).then((_) {
+                                            print("success!");
+                                            Navigator.pop(context);
+                                            setState(() {
+                                              loading = false;
+                                            });
+                                            _showToast(context);
+                                          });
+                                  } else if (_formKey.currentState!
+                                          .validate() &&
+                                      !isImageAdded) {
+                                    _showToastError(context);
                                   }
                                 },
                                 child: Row(
@@ -246,8 +316,10 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
   Future selectFile() async {
     var pickedImage = await ImagePicker.platform.pickImage(
       source: isGallery ? ImageSource.gallery : ImageSource.camera,
+      imageQuality: 25,
     );
     if (pickedImage == null) {
+      _showToastError(context);
     } else {
       File? croppedFile = await ImageCropper.cropImage(
           sourcePath: pickedImage.path,
@@ -259,8 +331,9 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
             CropAspectRatioPreset.ratio16x9
           ],
           androidUiSettings: AndroidUiSettings(
-              toolbarTitle: 'Cropper',
-              toolbarColor: Colors.deepOrange,
+              toolbarTitle: 'Crop Image',
+              toolbarColor: Colors.blue[900],
+              activeControlsWidgetColor: Colors.lightBlue[700],
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
               lockAspectRatio: false),
@@ -283,18 +356,25 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
       setState(() {
         loading = true;
       });
-      uploadDummyFile().whenComplete(() => loading = false);
+      if (initValueText.isEmpty) {
+        uploadDummyFile().whenComplete(() {
+          setState(() {
+            loading = false;
+            isDummyFileUsed = true;
+          });
+        });
+      } else {
+        setState(() {
+          uploadFile().whenComplete(() {
+            setState(() {
+              loading = false;
+              isDummyFileUsed = false;
+            });
+          });
+        });
+      }
     }
-    // _cropImage(pickedImage!.path);
   }
-
-  // _cropImage(filePath) async {
-  //   File? croppedImage = await ImageCropper.cropImage(
-  //     sourcePath: filePath,
-  //     maxWidth: 1080,
-  //     maxHeight: 1080,
-  //   );
-  // }
 
   Future uploadFile() async {
     var uid = firebaseUser?.uid;
@@ -336,6 +416,8 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
         imageUrl = await ref.getDownloadURL().whenComplete(
               () => setState(() {
                 isImageAdded = true;
+                message = "Image Uploaded";
+                _showToast(context);
               }),
             );
       }
