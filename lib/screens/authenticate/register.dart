@@ -17,6 +17,8 @@ class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
+  bool isSignedup = false;
+  bool isPwdVis = false;
 
   String email = '';
   String pwd1 = '';
@@ -78,12 +80,13 @@ class _RegisterState extends State<Register> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    // ignore: prefer_const_literals_to_create_immutables
                     children: [
                       SizedBox(
                         height: 20,
                       ),
                       TextFormField(
+                        initialValue: email,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: textInputDecoration.copyWith(
                           hintText: 'Email',
                           prefixIcon: Icon(Icons.email_rounded),
@@ -100,14 +103,25 @@ class _RegisterState extends State<Register> {
                         height: 20,
                       ),
                       TextFormField(
+                        initialValue: password,
                         decoration: textInputDecoration.copyWith(
                           hintText: 'Password',
                           prefixIcon: Icon(Icons.lock),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isPwdVis = !isPwdVis;
+                              });
+                            },
+                            child: isPwdVis
+                                ? Icon(Icons.visibility)
+                                : Icon(Icons.visibility_off),
+                          ),
                         ),
                         validator: (val) => val!.length < 6
                             ? 'Password must contain 6 or more characters'
                             : null,
-                        obscureText: true,
+                        obscureText: !isPwdVis,
                         onChanged: (val) {
                           setState(() {
                             pwd1 = val;
@@ -119,12 +133,22 @@ class _RegisterState extends State<Register> {
                       ),
                       TextFormField(
                         decoration: textInputDecoration.copyWith(
-                          hintText: 'Retype Password',
+                          hintText: 'Repeat Password',
                           prefixIcon: Icon(Icons.lock),
+                          suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isPwdVis = !isPwdVis;
+                                });
+                              },
+                              child: SizedBox(
+                                height: 0,
+                                width: 0,
+                              )),
                         ),
                         validator: (val) =>
                             pwd1 != pwd2 ? "Passwords don't match" : null,
-                        obscureText: true,
+                        obscureText: !isPwdVis,
                         onChanged: (val) {
                           setState(() {
                             pwd2 = val;

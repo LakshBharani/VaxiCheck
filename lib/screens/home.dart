@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -9,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:vaxicheck/screens/feedback.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
 import 'package:vaxicheck/services/auth.dart';
 import 'package:vaxicheck/services/searchservice.dart';
@@ -64,7 +64,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return !isSearching
         ? Scaffold(
-            drawer: Drawer(),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Colors.blue[800],
               onPressed: () {
@@ -116,6 +115,28 @@ class _HomeState extends State<Home> {
                       ),
                 PopupMenuButton(
                   itemBuilder: (context) => [
+                    PopupMenuItem(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => FeedBack()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => FeedBack()),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.feedback, color: Colors.blue[900]),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Feedback",
+                            style: TextStyle(color: Colors.blue[900]),
+                          ),
+                        ],
+                      ),
+                    ),
                     PopupMenuItem(
                       onTap: () async {
                         await _auth.signOut();
@@ -359,7 +380,6 @@ class _HomeState extends State<Home> {
           )
         : MaterialApp(
             home: Scaffold(
-              drawer: Drawer(),
               floatingActionButton: FloatingActionButton(
                 backgroundColor: Colors.blue[800],
                 onPressed: () {

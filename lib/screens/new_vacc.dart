@@ -143,49 +143,99 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                             height: 20,
                           ),
                           Container(
+                            height: 30,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Date :",
+                                  style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  currentDate,
+                                  style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue[800],
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      pickDate(context);
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                      size: 15,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Container(
                             height: 200,
                             width: 290,
                             color: Colors.white,
                             child: isImageAdded
                                 ? Image.network(imageUrl)
-                                :
-                                //  FlatButton(
-                                // color: Colors.white,
-                                // hoverColor: Colors.white,
-                                // onPressed: () {
-                                // showModalBottomSheet(
-                                //   context: context,
-                                //   builder: ((builder) => bottomSheet()),
-                                // );
-                                // },
-                                // child:
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.blue[800],
+                                : FlatButton(
+                                    color: Colors.white,
+                                    hoverColor: Colors.white,
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                        context: context,
+                                        builder: ((builder) => bottomSheet()),
+                                      );
+                                    },
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.camera_alt,
+                                              color: Colors.blue[800],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        'Please upload an image',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                        SizedBox(
+                                          height: 10,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'Please upload an image',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                            // ),
                           ),
-                          SizedBox(
+                            SizedBox(
                             height: 25,
                           ),
                           Row(
@@ -361,6 +411,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
           setState(() {
             loading = false;
             isDummyFileUsed = true;
+            message = "Vaccine record saved";
           });
         });
       } else {
@@ -369,6 +420,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
             setState(() {
               loading = false;
               isDummyFileUsed = false;
+              message = "Vaccine record saved";
             });
           });
         });
@@ -392,6 +444,8 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
       imageUrl = await ref.getDownloadURL().whenComplete(
             () => setState(() {
               isImageAdded = true;
+              message = "Image Uploaded";
+              _showToast(context);
             }),
           );
     }
@@ -427,6 +481,24 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
           FirebaseStorage.instance.ref().child("images/").child("dummyFiles/");
       ref.delete();
     }
+  }
+
+  Future pickDate(BuildContext context) async {
+    final initialDate = DateTime.now();
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(DateTime.now().year - 70),
+      lastDate: DateTime(DateTime.now().year + 1),
+    );
+
+    newDate == null
+        ? setState(() {
+            currentDate = DateFormat('dd MMMM yyyy').format(initialDate);
+          })
+        : setState(() {
+            currentDate = DateFormat('dd MMMM yyyy').format(newDate);
+          });
   }
 
   Widget bottomSheet() {
