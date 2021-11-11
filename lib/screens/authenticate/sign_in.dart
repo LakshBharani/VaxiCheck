@@ -71,85 +71,87 @@ class _SignInState extends State<SignIn> {
                 )
               ],
             ),
-            body: Center(
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        initialValue: email,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: textInputDecoration.copyWith(
-                          hintText: 'Email',
-                          prefixIcon: Icon(Icons.email_rounded),
+            body: SingleChildScrollView(
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 20,
                         ),
-                        validator: (val) =>
-                            val!.isEmpty ? 'Enter an email' : null,
-                        onChanged: (val) {
-                          setState(() {
-                            email = val;
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        initialValue: password,
-                        decoration: textInputDecoration.copyWith(
-                          hintText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isPwdVis = !isPwdVis;
-                              });
-                            },
-                            child: isPwdVis
-                                ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off),
+                        TextFormField(
+                          initialValue: email,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: textInputDecoration.copyWith(
+                            hintText: 'Email',
+                            prefixIcon: Icon(Icons.email_rounded),
                           ),
-                        ),
-                        validator: (val) => val!.length < 6
-                            ? 'Password must contain 6 or more characters'
-                            : null,
-                        obscureText: !isPwdVis,
-                        onChanged: (val) {
-                          setState(() {
-                            password = val;
-                          });
-                        },
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      FlatButton(
-                        color: Colors.blue[800],
-                        textColor: Colors.white,
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
+                          validator: (val) =>
+                              val!.isEmpty ? 'Enter an email' : null,
+                          onChanged: (val) {
                             setState(() {
-                              loading = true;
+                              email = val;
                             });
-                            dynamic result = await _auth
-                                .signInWithEmailAndPassword(email, password);
-                            if (result == null) {
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          initialValue: password,
+                          decoration: textInputDecoration.copyWith(
+                            hintText: 'Password',
+                            prefixIcon: Icon(Icons.lock),
+                            suffixIcon: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isPwdVis = !isPwdVis;
+                                });
+                              },
+                              child: isPwdVis
+                                  ? Icon(Icons.visibility)
+                                  : Icon(Icons.visibility_off),
+                            ),
+                          ),
+                          validator: (val) => val!.length < 6
+                              ? 'Password must contain 6 or more characters'
+                              : null,
+                          obscureText: !isPwdVis,
+                          onChanged: (val) {
+                            setState(() {
+                              password = val;
+                            });
+                          },
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        FlatButton(
+                          color: Colors.blue[800],
+                          textColor: Colors.white,
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
                               setState(() {
-                                error = 'Incorrect Email or Password';
-                                loading = false;
+                                loading = true;
                               });
-                              _showToast(context);
+                              dynamic result = await _auth
+                                  .signInWithEmailAndPassword(email, password);
+                              if (result == null) {
+                                setState(() {
+                                  error = 'Incorrect Email or Password';
+                                  loading = false;
+                                });
+                                _showToast(context);
+                              }
                             }
-                          }
-                        },
-                        child: Text("Sign In"),
-                      ),
-                    ],
+                          },
+                          child: Text("Sign In"),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
