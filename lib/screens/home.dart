@@ -140,6 +140,46 @@ class _HomeState extends State<Home> {
                     PopupMenuItem(
                       onTap: () async {
                         await _auth.signOut();
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (_) => AlertDialog(
+                        //     shape: RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(12),
+                        //     ),
+                        //     title: Text('Logout?'),
+                        //     content: Container(
+                        //       child:
+                        //           Text('You will be required to sign in again'),
+                        //     ),
+                        //     actions: [
+                        //       FlatButton(
+                        //         onPressed: () {
+                        //           Navigator.of(context).pop(false);
+                        //         },
+                        //         child: Text(
+                        //           'Cancel',
+                        //           style: TextStyle(
+                        //               color: Colors.blue, fontSize: 15),
+                        //         ),
+                        //       ),
+                        //       FlatButton(
+                        //         color: Colors.red,
+                        //         onPressed: () async {
+                        //           await _auth.signOut();
+                        //         },
+                        //         child: Text(
+                        //           'Yes',
+                        //           style: TextStyle(
+                        //               color: Colors.white, fontSize: 15),
+                        //         ),
+                        //       ),
+                        //       SizedBox(
+                        //         width: 5,
+                        //       ),
+                        //     ],
+                        //     elevation: 24,
+                        //   ),
+                        // );
                       },
                       child: Row(
                         children: [

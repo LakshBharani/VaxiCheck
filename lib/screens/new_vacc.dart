@@ -195,7 +195,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                           ),
                           Container(
                             height: 200,
-                            width: 290,
+                            width: MediaQuery.of(context).size.width,
                             color: Colors.white,
                             child: isImageAdded
                                 ? Image.network(imageUrl)
@@ -235,7 +235,7 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
                                     ),
                                   ),
                           ),
-                            SizedBox(
+                          SizedBox(
                             height: 25,
                           ),
                           Row(

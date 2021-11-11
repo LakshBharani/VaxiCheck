@@ -101,51 +101,51 @@ class _FeedBackState extends State<FeedBack> {
                         });
                       },
                     ),
-                    SizedBox(
-                      width: 82,
-                      child: FlatButton(
-                        padding: EdgeInsets.only(right: 0, left: 7),
-                        color: Colors.blue[800],
-                        textColor: Colors.white,
-                        onPressed: () async {
-                          isReadyForSubmit
-                              ? firestoreInstance
-                                  .collection("users")
-                                  .doc(firebaseUser?.uid)
-                                  .collection("feedback")
-                                  .doc(topic)
-                                  .set({
-                                  "feedback": body,
-                                }).then((_) {
-                                  Navigator.pop(context);
-                                  setState(() {
-                                    message = "Feedback submitted";
-                                    initValue = "";
-                                    topic = "";
-                                    body = "";
-                                  });
-                                  _showToast(context);
-                                }).whenComplete(() => {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Home()),
-                                          (Route<dynamic> route) => false,
-                                        ),
-                                      })
-                              : null;
-                        },
-                        child: Row(
-                          children: [
-                            Text("Submit"),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                            ),
-                          ],
-                        ),
+                    FlatButton(
+                      padding: EdgeInsets.only(right: 0, left: 7),
+                      color: Colors.blue[800],
+                      textColor: Colors.white,
+                      onPressed: () async {
+                        isReadyForSubmit
+                            ? firestoreInstance
+                                .collection("users")
+                                .doc(firebaseUser?.uid)
+                                .collection("feedback")
+                                .doc(topic)
+                                .set({
+                                "feedback": body,
+                              }).then((_) {
+                                Navigator.pop(context);
+                                setState(() {
+                                  message = "Feedback submitted";
+                                  initValue = "";
+                                  topic = "";
+                                  body = "";
+                                });
+                                _showToast(context);
+                              }).whenComplete(() => {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Home()),
+                                        (Route<dynamic> route) => false,
+                                      ),
+                                    })
+                            : null;
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Submit"),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                          ),
+                        ],
                       ),
                     ),
                   ],
