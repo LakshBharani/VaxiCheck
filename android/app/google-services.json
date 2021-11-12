@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "864652759770",
+    "firebase_url": "https://vaxicheck-becf6-default-rtdb.firebaseio.com",
     "project_id": "vaxicheck-becf6",
     "storage_bucket": "vaxicheck-becf6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:864652759770:android:c7242a53f73d56d6ef8be3",
+        "mobilesdk_app_id": "1:864652759770:android:55c36c88f98a7eb1ef8be3",
         "android_client_info": {
-          "package_name": "com.laksh.vaxicheck"
+          "package_name": "com.cubix.vaxicheck"
         }
       },
       "oauth_client": [

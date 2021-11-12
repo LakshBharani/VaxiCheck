@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, unused_field, avoid_print, prefer_const_constructors_in_immutables, use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:vaxicheck/screens/privacy.dart';
 import 'package:vaxicheck/services/auth.dart';
 import 'package:vaxicheck/shared/constants.dart';
 import 'package:vaxicheck/shared/loading.dart';
@@ -26,27 +27,27 @@ class _RegisterState extends State<Register> {
   String password = '';
   String error = '';
 
-  void _showToast(BuildContext context) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.cancel,
-              color: Colors.red,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Text(error),
-          ],
-        ),
-        action: SnackBarAction(
-            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
+  // void _showToast(BuildContext context) {
+  //   final scaffold = ScaffoldMessenger.of(context);
+  //   scaffold.showSnackBar(
+  //     SnackBar(
+  //       content: Row(
+  //         children: [
+  //           Icon(
+  //             Icons.cancel,
+  //             color: Colors.red,
+  //           ),
+  //           SizedBox(
+  //             width: 20,
+  //           ),
+  //           Text(error),
+  //         ],
+  //       ),
+  //       action: SnackBarAction(
+  //           label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +186,23 @@ class _RegisterState extends State<Register> {
                           height: 12,
                         ),
                         Text(error),
+                        SizedBox(
+                          height: 12,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => PrivacyPol()));
+                          },
+                          child: Text(
+                            "Click here to view our PRIVACY POLICY",
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              color: Colors.blue,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),

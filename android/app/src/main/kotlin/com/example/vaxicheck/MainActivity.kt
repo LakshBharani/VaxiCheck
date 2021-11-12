@@ -1,4 +1,4 @@
-package com.laksh.vaxicheck
+package com.cubix.vaxicheck
 
 import io.flutter.embedding.android.FlutterActivity
 
