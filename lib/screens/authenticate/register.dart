@@ -78,7 +78,7 @@ class _RegisterState extends State<Register> {
             body: SingleChildScrollView(
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -187,7 +187,7 @@ class _RegisterState extends State<Register> {
                         ),
                         Text(error),
                         SizedBox(
-                          height: 12,
+                          height: 10,
                         ),
                         InkWell(
                           onTap: () {
@@ -202,7 +202,7 @@ class _RegisterState extends State<Register> {
                               fontStyle: FontStyle.italic,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

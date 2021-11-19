@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, prefer_const_constructors, avoid_print, unused_field, use_key_in_widget_constructors, unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'package:vaxicheck/screens/authenticate/reset.dart';
 import 'package:vaxicheck/services/auth.dart';
 import 'package:vaxicheck/shared/constants.dart';
 import 'package:vaxicheck/shared/loading.dart';
@@ -74,7 +75,7 @@ class _SignInState extends State<SignIn> {
             body: SingleChildScrollView(
               child: Center(
                 child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -149,6 +150,22 @@ class _SignInState extends State<SignIn> {
                             }
                           },
                           child: Text("Sign In"),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ResetPwd()));
+                          },
+                          child: Text(
+                            "Forgot password?",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ),
                       ],
                     ),
