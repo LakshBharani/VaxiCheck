@@ -1,10 +1,7 @@
 // ignore_for_file: deprecated_member_use, avoid_unnecessary_containers, prefer_const_constructors
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:vaxicheck/screens/feedback.dart';
-import 'package:vaxicheck/services/auth.dart';
 import 'package:vaxicheck/shared/constants.dart';
 import 'package:vaxicheck/shared/loading.dart';
 
@@ -19,31 +16,12 @@ class _ResetPwdState extends State<ResetPwd> {
   final _formKey = GlobalKey<FormState>();
 
   String email = "";
+
   bool loading = false;
   bool isReady = false;
   String error = '';
-
-  void _showToast(BuildContext context) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.cancel,
-              color: Colors.red,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Text(error),
-          ],
-        ),
-        action: SnackBarAction(
-            label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
+  bool success = false;
+  bool emailValid = true;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +33,6 @@ class _ResetPwdState extends State<ResetPwd> {
               title: const Text('Reset Password'),
               backgroundColor: Colors.blue[800],
             ),
-
             body: SingleChildScrollView(
               child: Center(
                 child: Container(
@@ -65,10 +42,38 @@ class _ResetPwdState extends State<ResetPwd> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 20,
+                          height: 5,
+                        ),
+                        success
+                            ? Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.amber.shade800,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error,
+                                      color: Colors.amber[800],
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                          "Email sent. If you have not received it please check email and try again."),
+                                    ),
+                                  ],
+                                ))
+                            : Container(),
+                        SizedBox(
+                          height: 10,
                         ),
                         TextFormField(
-                          initialValue: "",
+                          initialValue: email,
                           keyboardType: TextInputType.emailAddress,
                           decoration: textInputDecoration.copyWith(
                             hintText: 'Email',
@@ -82,15 +87,51 @@ class _ResetPwdState extends State<ResetPwd> {
                             });
                           },
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        emailValid
+                            ? Container()
+                            : Container(
+                                margin: EdgeInsets.only(top: 5),
+                                child: Row(
+                                  // ignore: prefer_const_literals_to_create_immutables
+                                  children: [
+                                    Text(
+                                      "Invalid Email",
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        decoration: TextDecoration.underline,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                        emailValid
+                            ? SizedBox(
+                                height: 20,
+                              )
+                            : SizedBox(
+                                height: 10,
+                              ),
                         Container(
-                          // height: isReady ? null : 0,
                           child: FlatButton(
                             onPressed: () {
-                              // loading = true;
-                              sendPwdResetEmail(email);
+                              setState(() {
+                                emailValid = RegExp(
+                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                    .hasMatch(email);
+                              });
+                              if (email.isNotEmpty & emailValid) {
+                                print("Email: " + email);
+                                setState(() {
+                                  loading = true;
+                                });
+                                sendPwdResetEmail(email).whenComplete(() {
+                                  setState(() {
+                                    loading = false;
+                                    success = true;
+                                  });
+                                });
+                              }
                             },
                             color: Colors.blue[800],
                             child: Container(
@@ -107,59 +148,6 @@ class _ResetPwdState extends State<ResetPwd> {
                 ),
               ),
             ),
-            // body: SingleChildScrollView(
-            //   padding: const EdgeInsets.all(15),
-            //   child: Form(
-            //     key: _formKey,
-            //     child: Center(
-            //       child: Column(
-            //         children: [
-            //           TextFormField(
-            //             initialValue: "",
-            //             keyboardType: TextInputType.emailAddress,
-            //             decoration: textInputDecoration.copyWith(
-            //               hintText: 'Email',
-            //               prefixIcon: const Icon(Icons.email_rounded),
-            //             ),
-            //             validator: (val) =>
-            //                 val!.isEmpty ? 'Enter an email' : null,
-            //             onChanged: (val) {
-            //               if (val != "") {
-            //                 setState(() {
-            //                   email = val;
-            //                 });
-            //               }
-            //             },
-            //             onEditingComplete: () {
-            //               setState(() {
-            //                 isReady = true;
-            //               });
-            //             },
-            //           ),
-            //           const SizedBox(
-            //             height: 20,
-            //           ),
-            //     Container(
-            //       height: isReady ? null : 0,
-            //       child: FlatButton(
-            //         onPressed: () {
-            //           loading = true;
-            //           sendPwdResetEmail(email);
-            //         },
-            //         color: Colors.blue[800],
-            //         child: Container(
-            //           child: const Text(
-            //             "Send Reset Email",
-            //             style: TextStyle(color: Colors.white),
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // ),
-            // ),
-            // ),
           );
   }
 }
