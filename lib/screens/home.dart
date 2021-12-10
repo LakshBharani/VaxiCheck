@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
 import 'dart:io';
+import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -213,207 +214,235 @@ class _HomeState extends State<Home> {
                       child: CircularProgressIndicator(),
                     );
                   }
-                  return ListView(
-                    children: snapshot.data!.docs.map(
-                      (document) {
-                        return Card(
-                          elevation: 10,
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                            child: Column(
-                              children: [
-                                Center(
-                                  child: Container(
-                                    child: ExpansionTile(
-                                      key: GlobalKey(),
-                                      tilePadding: EdgeInsets.all(10),
-                                      backgroundColor: Colors.white,
-                                      collapsedBackgroundColor: Colors.white,
-                                      textColor: Colors.black,
-                                      collapsedTextColor: Colors.black,
-                                      title: Column(
-                                        children: [
-                                          Text(
-                                            document['vaccName'],
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                        ],
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Date : " + document['date'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                            "Doses : " + document['doses'],
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      children: [
-                                        Column(
-                                          children: [
-                                            (document
-                                                    .data()
-                                                    .toString()
-                                                    .contains('imageUrl'))
-                                                ? ConstrainedBox(
-                                                    constraints: BoxConstraints(
-                                                      maxHeight: 125,
-                                                      minHeight: 0,
-                                                    ),
-                                                    child: Container(
-                                                      color: Colors.amber[100],
-                                                      child: Image.network(
-                                                          document['imageUrl']),
-                                                    ),
-                                                  )
-                                                : Container(),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
+                  return snapshot.data!.docs.isNotEmpty
+                      ? ListView(
+                          children: snapshot.data!.docs.map(
+                            (document) {
+                              return Card(
+                                elevation: 10,
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          child: ExpansionTile(
+                                            key: GlobalKey(),
+                                            tilePadding: EdgeInsets.all(10),
+                                            backgroundColor: Colors.white,
+                                            collapsedBackgroundColor:
+                                                Colors.white,
+                                            textColor: Colors.black,
+                                            collapsedTextColor: Colors.black,
+                                            title: Column(
                                               children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 10,
-                                                          right: 10,
-                                                          bottom: 5),
-                                                  child: FlatButton(
-                                                    color: Colors.red,
-                                                    onPressed: () {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (_) =>
-                                                            AlertDialog(
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                          ),
-                                                          title:
-                                                              Text('Delete?'),
-                                                          content: Container(
-                                                            child: Text(
-                                                                'This will delete the current record'),
-                                                          ),
-                                                          actions: [
-                                                            FlatButton(
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(false);
-                                                              },
-                                                              child: Text(
-                                                                'Cancel',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .blue,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                            ),
-                                                            FlatButton(
-                                                              color: Colors.red,
-                                                              onPressed: () {
-                                                                // delete vaccine record
-                                                                FirebaseFirestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        "users")
-                                                                    .doc(firebaseUser
-                                                                        ?.uid)
-                                                                    .collection(
-                                                                        'vaccines')
-                                                                    .doc(document[
-                                                                            'vaccName']
-                                                                        .toString()
-                                                                        .toLowerCase())
-                                                                    .delete();
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(false);
-
-                                                                // delete image from storage
-                                                                var uid =
-                                                                    firebaseUser
-                                                                        ?.uid;
-                                                                Reference ref = FirebaseStorage
-                                                                    .instance
-                                                                    .ref()
-                                                                    .child(
-                                                                        "images/")
-                                                                    .child(
-                                                                        "$uid/")
-                                                                    .child(document[
-                                                                            'vaccName']
-                                                                        .toString()
-                                                                        .toLowerCase());
-                                                                ref.delete();
-                                                              },
-                                                              child: Text(
-                                                                'Delete',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        15),
-                                                              ),
-                                                            ),
-                                                            SizedBox(
-                                                              width: 5,
-                                                            ),
-                                                          ],
-                                                          elevation: 24,
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Text(
-                                                      'Delete',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15),
-                                                    ),
+                                                Text(
+                                                  document['vaccName'],
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Date : " + document['date'],
+                                                  style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  "Doses : " +
+                                                      document['doses'],
+                                                  style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    fontSize: 14,
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          ],
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  (document
+                                                          .data()
+                                                          .toString()
+                                                          .contains('imageUrl'))
+                                                      ? ConstrainedBox(
+                                                          constraints:
+                                                              BoxConstraints(
+                                                            maxHeight: 125,
+                                                            minHeight: 0,
+                                                          ),
+                                                          child: Container(
+                                                            color: Colors
+                                                                .amber[100],
+                                                            child: Image.network(
+                                                                document[
+                                                                    'imageUrl']),
+                                                          ),
+                                                        )
+                                                      : Container(),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                top: 10,
+                                                                right: 10,
+                                                                bottom: 5),
+                                                        child: FlatButton(
+                                                          color: Colors.red,
+                                                          onPressed: () {
+                                                            showDialog(
+                                                              context: context,
+                                                              builder: (_) =>
+                                                                  AlertDialog(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              12),
+                                                                ),
+                                                                title: Text(
+                                                                    'Delete?'),
+                                                                content:
+                                                                    Container(
+                                                                  child: Text(
+                                                                      'This action can not be undone.'),
+                                                                ),
+                                                                actions: [
+                                                                  FlatButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              false);
+                                                                    },
+                                                                    child: Text(
+                                                                      'Cancel',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .blue,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                  ),
+                                                                  FlatButton(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    onPressed:
+                                                                        () {
+                                                                      // delete vaccine record
+                                                                      FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              "users")
+                                                                          .doc(firebaseUser
+                                                                              ?.uid)
+                                                                          .collection(
+                                                                              'vaccines')
+                                                                          .doc(document['vaccName']
+                                                                              .toString()
+                                                                              .toLowerCase())
+                                                                          .delete();
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              false);
+
+                                                                      // delete image from storage
+                                                                      var uid =
+                                                                          firebaseUser
+                                                                              ?.uid;
+                                                                      Reference ref = FirebaseStorage
+                                                                          .instance
+                                                                          .ref()
+                                                                          .child(
+                                                                              "images/")
+                                                                          .child(
+                                                                              "$uid/")
+                                                                          .child(document['vaccName']
+                                                                              .toString()
+                                                                              .toLowerCase());
+                                                                      ref.delete();
+                                                                    },
+                                                                    child: Text(
+                                                                      'Delete',
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .white,
+                                                                          fontSize:
+                                                                              15),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 5,
+                                                                  ),
+                                                                ],
+                                                                elevation: 24,
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: Text(
+                                                            'Delete',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 15),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              );
+                            },
+                          ).toList(),
+                        )
+                      : Stack(
+                          children: [
+                            Positioned(
+                              bottom: 50,
+                              right: 50,
+                              child: Container(
+                                  height: 100,
+                                  child:
+                                      Image.asset("lib/assets/getstarted.png")),
                             ),
-                          ),
+                          ],
                         );
-                      },
-                    ).toList(),
-                  );
                 },
               ),
             ),
@@ -494,7 +523,7 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.all(8.0),
                 child: GridView.count(
                     childAspectRatio: (1 / .65),
-                    crossAxisCount: 2,
+                    crossAxisCount: MediaQuery.of(context).size.width ~/ 165,
                     crossAxisSpacing: 4,
                     mainAxisSpacing: 4,
                     primary: false,
