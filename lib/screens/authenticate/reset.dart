@@ -1,4 +1,6 @@
-// ignore_for_file: deprecated_member_use, avoid_unnecessary_containers, prefer_const_constructors
+// ignore_for_file: deprecated_member_use, avoid_unnecessary_containers, prefer_const_constructors, avoid_print
+
+import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +18,37 @@ class _ResetPwdState extends State<ResetPwd> {
   final _formKey = GlobalKey<FormState>();
 
   String email = "";
-
+  bool timeUp = true;
   bool loading = false;
   bool isReady = false;
   String error = '';
+  int seconds = 30;
+
+  Timer? timer;
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {
+          timeUp = false;
+          seconds--;
+          if (seconds > 0) {
+            print(seconds);
+          } else {
+            print("Time up");
+            if (mounted) {
+              setState(() {
+                timeUp = true;
+                seconds = 30;
+              });
+            }
+
+            timer!.cancel();
+          }
+        });
+      }
+    });
+  }
+
   bool success = false;
   bool emailValid = true;
 
@@ -114,31 +143,51 @@ class _ResetPwdState extends State<ResetPwd> {
                               ),
                         Container(
                           child: FlatButton(
-                            onPressed: () {
-                              setState(() {
-                                emailValid = RegExp(
-                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                    .hasMatch(email);
-                              });
-                              if (email.isNotEmpty & emailValid) {
-                                print("Email: " + email);
-                                setState(() {
-                                  loading = true;
-                                });
-                                sendPwdResetEmail(email).whenComplete(() {
-                                  setState(() {
-                                    loading = false;
-                                    success = true;
-                                  });
-                                });
-                              }
-                            },
-                            color: Colors.blue[800],
+                            onPressed: timeUp
+                                ? () {
+                                    setState(() {
+                                      emailValid = RegExp(
+                                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                          .hasMatch(email);
+                                    });
+                                    if (email.isNotEmpty & emailValid) {
+                                      print("Email: " + email);
+                                      setState(() {
+                                        loading = true;
+                                      });
+                                      sendPwdResetEmail(email).whenComplete(() {
+                                        setState(() {
+                                          loading = false;
+                                          success = true;
+                                          timeUp = false;
+                                        });
+                                        startTimer();
+                                        // Timer timer = Timer.periodic(
+                                        //     Duration(seconds: 5), (timer) {
+                                        //   setState(() {
+                                        //     timeUp = false;
+                                        //     seconds--;
+                                        //   });
+                                        //   print(seconds);
+
+                                        //   timer.cancel();
+                                        //   setState(() {
+                                        //     timeUp = true;
+                                        //   });
+                                        //   print("Time up");
+                                        // });
+                                      });
+                                    }
+                                  }
+                                : () {},
+                            color: timeUp ? Colors.blue[800] : Colors.grey[300],
                             child: Container(
-                              child: const Text(
-                                "Send Reset Email",
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: timeUp
+                                  ? Text(
+                                      "Send Reset Email",
+                                      style: TextStyle(color: Colors.white),
+                                    )
+                                  : Text("Try again in $seconds seconds"),
                             ),
                           ),
                         ),
