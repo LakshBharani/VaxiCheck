@@ -27,28 +27,6 @@ class _RegisterState extends State<Register> {
   String password = '';
   String error = '';
 
-  // void _showToast(BuildContext context) {
-  //   final scaffold = ScaffoldMessenger.of(context);
-  //   scaffold.showSnackBar(
-  //     SnackBar(
-  //       content: Row(
-  //         children: [
-  //           Icon(
-  //             Icons.cancel,
-  //             color: Colors.red,
-  //           ),
-  //           SizedBox(
-  //             width: 20,
-  //           ),
-  //           Text(error),
-  //         ],
-  //       ),
-  //       action: SnackBarAction(
-  //           label: 'OK', onPressed: scaffold.hideCurrentSnackBar),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return loading

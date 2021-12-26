@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
   var tempSearchStore = [];
   bool isSearching = false;
   File? file;
+  int imageCount = 1;
 
   final AuthService _auth = AuthService();
   var firebaseUser = FirebaseAuth.instance.currentUser;
@@ -431,17 +432,88 @@ class _HomeState extends State<Home> {
                             },
                           ).toList(),
                         )
-                      : Stack(
-                          children: [
-                            Positioned(
-                              bottom: 50,
-                              right: 50,
-                              child: Container(
-                                  height: 100,
-                                  child:
-                                      Image.asset("lib/assets/getstarted.png")),
-                            ),
-                          ],
+                      : Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                child: Center(
+                                  child: Container(
+                                    width: 400,
+                                    child: Card(
+                                      elevation: 15,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                              height: 100,
+                                              child: Image.asset(
+                                                  "lib/assets/welcomeCards/$imageCount.png")),
+                                          ButtonBar(
+                                            children: [
+                                              imageCount < 4
+                                                  ? FlatButton(
+                                                      onPressed: () {
+                                                        Navigator.of(context).push(
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        NewVaccinePage()));
+                                                      },
+                                                      child: Text("Skip"),
+                                                    )
+                                                  : SizedBox(width: 0),
+                                              imageCount > 1
+                                                  ? FlatButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          imageCount >= 1
+                                                              ? imageCount -= 1
+                                                              : null;
+                                                        });
+                                                      },
+                                                      child: Text("Previous"),
+                                                    )
+                                                  : SizedBox(width: 0),
+                                              FlatButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    imageCount < 4
+                                                        ? imageCount += 1
+                                                        : Navigator.of(context)
+                                                            .push(MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        NewVaccinePage()));
+                                                  });
+                                                },
+                                                child: Text("Next"),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              imageCount == 2
+                                  ? Positioned(
+                                      bottom: 20,
+                                      right: 40,
+                                      child: Container(
+                                        height: 75,
+                                        child: Image.asset(
+                                            "lib/assets/arrows.png"),
+                                      ),
+                                    )
+                                  : SizedBox(),
+                            ],
+                          ),
                         );
                 },
               ),

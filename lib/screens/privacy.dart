@@ -19,7 +19,7 @@ class _PrivacyPolState extends State<PrivacyPol> {
         backgroundColor: Colors.blue[800],
       ),
       url:
-          "https://github.com/LakshBharani/cubix-privacy/blob/main/privacy-policy.md",
+          "https://www.termsfeed.com/live/fb2f44a2-3543-464f-be1c-4ecd91a6e585",
       withZoom: true,
     );
   }
