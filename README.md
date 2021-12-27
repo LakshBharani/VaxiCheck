@@ -10,4 +10,4 @@ Mobile app built using dart to keep track of your vaccinations
 <img src="https://user-images.githubusercontent.com/80910691/136198133-173bc88d-8a8b-4fa9-97bd-6513865dac32.png" height="600"></a>
 
 # Download Link
-https://drive.google.com/file/d/1XWoQbsE9227KbB4FV1ufqkEe1DcYBMxl/view?usp=sharing
+https://drive.google.com/file/d/1luh2KhepopzpeCncaPIahIVTqsV4hXrI/view?usp=sharing
