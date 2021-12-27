@@ -439,9 +439,9 @@ class _HomeState extends State<Home> {
                               Positioned(
                                 child: Center(
                                   child: Container(
-                                    width: 400,
+                                    width: 500,
                                     child: Card(
-                                      elevation: 15,
+                                      elevation: 5,
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
@@ -450,7 +450,13 @@ class _HomeState extends State<Home> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
-                                              height: 100,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height /
+                                                  5,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
                                               child: Image.asset(
                                                   "lib/assets/welcomeCards/$imageCount.png")),
                                           ButtonBar(
