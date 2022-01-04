@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:864652759770:android:55c36c88f98a7eb1ef8be3",
+        "mobilesdk_app_id": "1:864652759770:android:0428c38eb562b4ddef8be3",
         "android_client_info": {
-          "package_name": "com.cubix.vaxicheck"
+          "package_name": "org.cubix.vaxicheck"
         }
       },
       "oauth_client": [

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cubix.vaxicheck">
+    package="org.cubix.vaxicheck">
    <application
         android:label="VaxiCheck"
         android:icon="@mipmap/ic_launcher">
