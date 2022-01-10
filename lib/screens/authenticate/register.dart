@@ -152,7 +152,7 @@ class _RegisterState extends State<Register> {
                                       email, password);
                               if (result == null) {
                                 setState(() {
-                                  error = 'Please enter a valid email';
+                                  error = 'Invalid email id or password.';
                                   loading = false;
                                 });
                               }
@@ -164,6 +164,27 @@ class _RegisterState extends State<Register> {
                           height: 12,
                         ),
                         Text(error),
+                        error != ""
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("If you have already registered "),
+                                  InkWell(
+                                    child: Text(
+                                      'Sign in',
+                                      style: TextStyle(
+                                        color: Colors.blue,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      widget.toggleView();
+                                    },
+                                  ),
+                                ],
+                              )
+                            : SizedBox(),
                         SizedBox(
                           height: 10,
                         ),

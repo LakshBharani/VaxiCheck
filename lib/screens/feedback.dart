@@ -16,10 +16,11 @@ class FeedBack extends StatefulWidget {
 final _formKey = GlobalKey<FormState>();
 String topic = '';
 String body = '';
-String initValue = "";
+String initValue = '';
 String message = '';
 String errorMessage = '';
-bool isReadyForSubmit = false;
+bool isTopicReady = false;
+bool isBodyReady = false;
 
 final firestoreInstance = FirebaseFirestore.instance;
 
@@ -70,15 +71,19 @@ class _FeedBackState extends State<FeedBack> {
                     ),
                     TextFormField(
                       initialValue: initValue,
-                      maxLength: 30,
                       validator: (val) =>
-                          val!.isEmpty ? 'Field cannot be empty' : null,
+                          val!.isEmpty ? 'Topic cannot be empty' : null,
                       decoration: textInputDecoration.copyWith(
                         labelText: "Topic",
+                        errorText:
+                            isTopicReady ? null : 'Topic cannot be empty',
                       ),
                       onChanged: (val) {
                         setState(() {
                           topic = val;
+                          topic.isEmpty
+                              ? isTopicReady = false
+                              : isTopicReady = true;
                         });
                       },
                     ),
@@ -86,27 +91,30 @@ class _FeedBackState extends State<FeedBack> {
                       height: 20,
                     ),
                     TextFormField(
-                      maxLength: 150,
                       initialValue: initValue,
                       maxLines: null,
-                      validator: (val) =>
-                          val!.isEmpty ? 'Field cannot be empty' : null,
                       decoration: textInputDecoration.copyWith(
                         labelText: "Body",
+                        errorText: isBodyReady ? null : 'Body cannot be empty',
                       ),
                       onChanged: (val) {
                         setState(() {
                           body = val;
-                          isReadyForSubmit = true;
+                          body.isEmpty
+                              ? isBodyReady = false
+                              : isBodyReady = true;
                         });
                       },
+                    ),
+                    SizedBox(
+                      height: 20,
                     ),
                     FlatButton(
                       padding: EdgeInsets.only(right: 0, left: 7),
                       color: Colors.blue[800],
                       textColor: Colors.white,
                       onPressed: () async {
-                        isReadyForSubmit
+                        isBodyReady & isTopicReady
                             ? firestoreInstance
                                 .collection("users")
                                 .doc(firebaseUser?.uid)

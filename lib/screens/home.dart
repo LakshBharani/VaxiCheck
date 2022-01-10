@@ -122,9 +122,9 @@ class _HomeState extends State<Home> {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => FeedBack()));
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => FeedBack()),
-                        );
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FeedBack()));
                       },
                       child: Row(
                         children: [
@@ -134,6 +134,42 @@ class _HomeState extends State<Home> {
                           ),
                           Text(
                             "Feedback",
+                            style: TextStyle(color: Colors.blue[900]),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      onTap: () {
+                        showAboutDialog(
+                            context: context,
+                            applicationName: 'VaxiCheck',
+                            applicationVersion: '2.0.0',
+                            applicationIcon: Container(
+                              height: 40,
+                              child: Image.asset('lib/assets/logo.png'),
+                            ),
+                            applicationLegalese:
+                                '''VaxiCheck is an application that lets users keep track of their general vaccination and inoculation schedules. Children across the world up to 20 years of age are administered a variety of preventive vaccination from birth to build their long term immunity from a variety of life-threatening diseases. Vaccination schedules are spread over a long period of time ranging from a few weeks to a few years which makes it hard for the parents to track these over many years. Additionally - doctors, record-keeping books lack standards across many regions and countries and records are hard to read, follow and maintain over time.
+
+This app intends to simplify book keeping for how General Vaccination schedules are tracked, maintained and referred after these are administered on the advice of practising physicians. 
+
+Legal Disclaimer :
+This android application is created only for the purpose of digitally organising and tracking information. The application does not intend to provide any specific medical recommendation or professional advice. Users are suggested to follow professional vaccination advice from their respective medical practitioners. This tool should be used as an aid to digitally track the vaccination schedule as suggested by the respective practitioner. The app does not provide any medical advice directly or indirectly.
+
+In no event, the developer of the application will be liable in any manner for any direct, indirect, incidental, consequential, indirect or punitive damages arising out of your access, use or inability to use the application or any errors/omission in the information on this application. The creator of the application reserves the right at any time and from time to time to add, modify and update or discontinue, temporarily or permanently the application (or any part thereof) with or without notice. The creator of the application shall not be liable to you or to any third party for any addition, modification, suspension or discontinuation of this application.''');
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => AboutDialog()));
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded,
+                              color: Colors.blue[900]),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "About",
                             style: TextStyle(color: Colors.blue[900]),
                           ),
                         ],

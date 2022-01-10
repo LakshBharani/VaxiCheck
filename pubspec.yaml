@@ -83,6 +83,7 @@ flutter:
     - lib/assets/welcomeCards/2.png
     - lib/assets/welcomeCards/3.png
     - lib/assets/welcomeCards/4.png
+    - lib/assets/logo.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
