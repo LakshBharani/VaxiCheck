@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:new_version/new_version.dart';
 import 'package:provider/provider.dart';
 import 'package:vaxicheck/models/user.dart';
 import 'package:vaxicheck/screens/wrapper.dart';
@@ -37,5 +39,19 @@ class _MyAppState extends State<MyApp> {
         home: const Wrapper(),
       ),
     );
+  }
+
+  void _checkVersion() async {
+    final newVersion = NewVersion(
+      androidId: "com.cubix.vaxicheck",
+    );
+    final status = await newVersion.getVersionStatus();
+    newVersion.showUpdateDialog(
+        context: context,
+        versionStatus: status!,
+        dismissButtonText: "Skip",
+        dismissAction: () {
+          SystemNavigator.pop();
+        });
   }
 }

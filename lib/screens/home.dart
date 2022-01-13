@@ -1,14 +1,17 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:vaxicheck/screens/authenticate/sign_in.dart';
 import 'package:vaxicheck/screens/feedback.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
 import 'package:vaxicheck/services/auth.dart';
@@ -66,6 +69,182 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return !isSearching
         ? Scaffold(
+            drawer: Drawer(
+              child: ListView(
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              "https://t3.ftcdn.net/jpg/04/53/77/50/360_F_453775063_7wL8UuP3ZKKcIlBOTxyph9q8vMeqR5C3.jpg"),
+                          fit: BoxFit.cover),
+                    ),
+                    padding: EdgeInsets.all(0),
+                    child: Container(
+                      padding: EdgeInsets.all(25),
+                      // color: Colors.blue[900],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.blue[900],
+                            child: ClipOval(
+                                child: firebaseUser!.photoURL == null
+                                    ? Icon(
+                                        Icons.account_circle,
+                                        size: 70,
+                                      )
+                                    : Image.network(firebaseUser!.photoURL!)),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          firebaseUser!.email == null
+                              ? Text(
+                                  "No Email Found",
+                                  style: TextStyle(color: Colors.white),
+                                )
+                              : Text(
+                                  firebaseUser!.email!,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    title: Row(
+                      children: const [
+                        Text(
+                          "Add Account",
+                          style: TextStyle(color: Colors.transparent),
+                        ),
+                        SizedBox(
+                          width: 160,
+                        ),
+                        Icon(
+                          Icons.add,
+                          color: Colors.transparent,
+                        )
+                      ],
+                    ),
+                  ),
+                  Divider(color: Colors.transparent),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 450,
+                    color: Colors.transparent,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: const [],
+                      ),
+                    ),
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline_rounded,
+                            color: Colors.blue[900]),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "About",
+                          style: TextStyle(color: Colors.blue[900]),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      showAboutDialog(
+                          context: context,
+                          applicationName: 'VaxiCheck',
+                          applicationVersion: '2.0.0',
+                          applicationIcon: Container(
+                            height: 40,
+                            child: Image.asset('lib/assets/logo.png'),
+                          ),
+                          applicationLegalese:
+                              '''VaxiCheck is an application that lets users keep track of their general vaccination and inoculation schedules. Children across the world up to 20 years of age are administered a variety of preventive vaccination from birth to build their long term immunity from a variety of life-threatening diseases. Vaccination schedules are spread over a long period of time ranging from a few weeks to a few years which makes it hard for the parents to track these over many years. Additionally - doctors, record-keeping books lack standards across many regions and countries and records are hard to read, follow and maintain over time.
+
+This app intends to simplify book keeping for how General Vaccination schedules are tracked, maintained and referred after these are administered on the advice of practising physicians. 
+
+Legal Disclaimer :
+This android application is created only for the purpose of digitally organising and tracking information. The application does not intend to provide any specific medical recommendation or professional advice. Users are suggested to follow professional vaccination advice from their respective medical practitioners. This tool should be used as an aid to digitally track the vaccination schedule as suggested by the respective practitioner. The app does not provide any medical advice directly or indirectly.
+
+In no event, the developer of the application will be liable in any manner for any direct, indirect, incidental, consequential, indirect or punitive damages arising out of your access, use or inability to use the application or any errors/omission in the information on this application. The creator of the application reserves the right at any time and from time to time to add, modify and update or discontinue, temporarily or permanently the application (or any part thereof) with or without notice. The creator of the application shall not be liable to you or to any third party for any addition, modification, suspension or discontinuation of this application.''');
+                    },
+                  ),
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Icon(Icons.feedback, color: Colors.blue[900]),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Feedback",
+                          style: TextStyle(color: Colors.blue[900]),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const FeedBack()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Row(
+                      children: [
+                        Icon(Icons.logout, color: Colors.red[900]),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.red[900]),
+                        ),
+                      ],
+                    ),
+                    onTap: () async {
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text('Logout'),
+                                content: Text('You will have to sign in again'),
+                                actions: [
+                                  ButtonBar(
+                                    children: [
+                                      FlatButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text("Cancel")),
+                                      FlatButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            await _auth.signOut();
+                                          },
+                                          child: Text(
+                                            "Logout",
+                                            style: TextStyle(color: Colors.red),
+                                          ))
+                                    ],
+                                  ),
+                                ],
+                              ));
+                    },
+                  ),
+                ],
+              ),
+            ),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Colors.blue[800],
               onPressed: () {
@@ -115,125 +294,34 @@ class _HomeState extends State<Home> {
                         },
                         icon: Icon(Icons.search_rounded),
                       ),
-                PopupMenuButton(
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => FeedBack()));
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FeedBack()));
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.feedback, color: Colors.blue[900]),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Feedback",
-                            style: TextStyle(color: Colors.blue[900]),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () {
-                        showAboutDialog(
-                            context: context,
-                            applicationName: 'VaxiCheck',
-                            applicationVersion: '2.0.0',
-                            applicationIcon: Container(
-                              height: 40,
-                              child: Image.asset('lib/assets/logo.png'),
-                            ),
-                            applicationLegalese:
-                                '''VaxiCheck is an application that lets users keep track of their general vaccination and inoculation schedules. Children across the world up to 20 years of age are administered a variety of preventive vaccination from birth to build their long term immunity from a variety of life-threatening diseases. Vaccination schedules are spread over a long period of time ranging from a few weeks to a few years which makes it hard for the parents to track these over many years. Additionally - doctors, record-keeping books lack standards across many regions and countries and records are hard to read, follow and maintain over time.
-
-This app intends to simplify book keeping for how General Vaccination schedules are tracked, maintained and referred after these are administered on the advice of practising physicians. 
-
-Legal Disclaimer :
-This android application is created only for the purpose of digitally organising and tracking information. The application does not intend to provide any specific medical recommendation or professional advice. Users are suggested to follow professional vaccination advice from their respective medical practitioners. This tool should be used as an aid to digitally track the vaccination schedule as suggested by the respective practitioner. The app does not provide any medical advice directly or indirectly.
-
-In no event, the developer of the application will be liable in any manner for any direct, indirect, incidental, consequential, indirect or punitive damages arising out of your access, use or inability to use the application or any errors/omission in the information on this application. The creator of the application reserves the right at any time and from time to time to add, modify and update or discontinue, temporarily or permanently the application (or any part thereof) with or without notice. The creator of the application shall not be liable to you or to any third party for any addition, modification, suspension or discontinuation of this application.''');
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => AboutDialog()));
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.info_outline_rounded,
-                              color: Colors.blue[900]),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "About",
-                            style: TextStyle(color: Colors.blue[900]),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () async {
-                        await _auth.signOut();
-                        // showDialog(
-                        //   context: context,
-                        //   builder: (_) => AlertDialog(
-                        //     shape: RoundedRectangleBorder(
-                        //       borderRadius: BorderRadius.circular(12),
-                        //     ),
-                        //     title: Text('Logout?'),
-                        //     content: Container(
-                        //       child:
-                        //           Text('You will be required to sign in again'),
-                        //     ),
-                        //     actions: [
-                        //       FlatButton(
-                        //         onPressed: () {
-                        //           Navigator.of(context).pop(false);
-                        //         },
-                        //         child: Text(
-                        //           'Cancel',
-                        //           style: TextStyle(
-                        //               color: Colors.blue, fontSize: 15),
-                        //         ),
-                        //       ),
-                        //       FlatButton(
-                        //         color: Colors.red,
-                        //         onPressed: () async {
-                        //           await _auth.signOut();
-                        //         },
-                        //         child: Text(
-                        //           'Yes',
-                        //           style: TextStyle(
-                        //               color: Colors.white, fontSize: 15),
-                        //         ),
-                        //       ),
-                        //       SizedBox(
-                        //         width: 5,
-                        //       ),
-                        //     ],
-                        //     elevation: 24,
-                        //   ),
-                        // );
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.logout, color: Colors.blue[900]),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Logout",
-                            style: TextStyle(color: Colors.blue[900]),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                              title: Text('Coming Soon...'),
+                              content: Text(
+                                  'Reminders and Educational content coming soon'),
+                              actions: [
+                                ButtonBar(
+                                  buttonPadding: EdgeInsets.all(0),
+                                  children: [
+                                    FlatButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ));
+                  },
+                  icon: Icon(
+                    Icons.notifications_active,
+                    color: Colors.yellow,
+                  ),
+                )
               ],
             ),
             body: Padding(
@@ -411,7 +499,6 @@ In no event, the developer of the application will be liable in any manner for a
                                                                           .pop(
                                                                               false);
 
-                                                                      // delete image from storage
                                                                       var uid =
                                                                           firebaseUser
                                                                               ?.uid;
@@ -602,35 +689,22 @@ In no event, the developer of the application will be liable in any manner for a
                           },
                           icon: Icon(Icons.cancel),
                         )
-                      : IconButton(
-                          onPressed: () {
-                            setState(() {
-                              isSearching = !isSearching;
-                            });
-                          },
-                          icon: Icon(Icons.search_rounded),
-                        ),
-                  PopupMenuButton(
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        onTap: () async {
-                          await _auth.signOut();
-                        },
-                        child: Row(
+                      : Row(
                           children: [
-                            Icon(Icons.logout, color: Colors.blue[900]),
-                            SizedBox(
-                              width: 10,
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.arrow_back_ios_rounded),
                             ),
-                            Text(
-                              "Logout",
-                              style: TextStyle(color: Colors.blue[900]),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isSearching = !isSearching;
+                                });
+                              },
+                              icon: Icon(Icons.search_rounded),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
               body: Padding(
