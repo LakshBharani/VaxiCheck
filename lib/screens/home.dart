@@ -1,17 +1,14 @@
 // ignore_for_file: prefer_const_constructors, deprecated_member_use, avoid_unnecessary_containers, prefer_is_empty, sized_box_for_whitespace, unused_label, avoid_function_literals_in_foreach_calls
 
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
-import 'package:vaxicheck/screens/authenticate/sign_in.dart';
 import 'package:vaxicheck/screens/feedback.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
 import 'package:vaxicheck/services/auth.dart';

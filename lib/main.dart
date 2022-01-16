@@ -30,6 +30,27 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void initState() {
+    super.initState();
+
+    final newVersion = NewVersion(
+      iOSId: 'com.cubix.vaxicheck',
+      androidId: 'com.cubix.vaxicheck',
+    );
+
+    const simpleBehavior = true;
+    if (simpleBehavior) {
+      basicStatusCheck(newVersion);
+    } else {
+      null;
+    }
+  }
+
+  basicStatusCheck(NewVersion newVersion) {
+    newVersion.showAlertIfNecessary(context: context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamProvider<AppUser?>.value(
       value: AuthService().user,
@@ -39,19 +60,5 @@ class _MyAppState extends State<MyApp> {
         home: const Wrapper(),
       ),
     );
-  }
-
-  void _checkVersion() async {
-    final newVersion = NewVersion(
-      androidId: "com.cubix.vaxicheck",
-    );
-    final status = await newVersion.getVersionStatus();
-    newVersion.showUpdateDialog(
-        context: context,
-        versionStatus: status!,
-        dismissButtonText: "Skip",
-        dismissAction: () {
-          SystemNavigator.pop();
-        });
   }
 }
