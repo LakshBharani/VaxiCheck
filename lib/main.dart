@@ -34,15 +34,15 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     final newVersion = NewVersion(
-      iOSId: 'com.cubix.vaxicheck',
-      androidId: 'com.cubix.vaxicheck',
+      iOSId: 'org.cubix.vaxicheck',
+      androidId: 'org.cubix.vaxicheck',
     );
 
     const simpleBehavior = true;
     if (simpleBehavior) {
       basicStatusCheck(newVersion);
     } else {
-      null;
+      print("UP TO DATE VERSION");
     }
   }
 

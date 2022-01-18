@@ -57,10 +57,10 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "org.cubix.vaxicheck"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 30
-        versionCode 3
-        versionName "2.0.1"
+        versionCode 5 
+        versionName "5"
         multiDexEnabled true
     }
 

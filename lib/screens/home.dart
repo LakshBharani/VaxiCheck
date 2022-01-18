@@ -9,10 +9,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
-import 'package:vaxicheck/screens/feedback.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:vaxicheck/screens/edit_vacc.dart';
+import 'package:vaxicheck/screens/expanded_view_image.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
+import 'package:vaxicheck/screens/vacc_ed.dart';
 import 'package:vaxicheck/services/auth.dart';
 import 'package:vaxicheck/services/searchservice.dart';
+import 'package:badges/badges.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -27,6 +31,7 @@ class _HomeState extends State<Home> {
   bool isSearching = false;
   File? file;
   int imageCount = 1;
+  int notifCounter = 1;
 
   final AuthService _auth = AuthService();
   var firebaseUser = FirebaseAuth.instance.currentUser;
@@ -131,7 +136,7 @@ class _HomeState extends State<Home> {
                   ),
                   Divider(color: Colors.transparent),
                   Container(
-                    height: MediaQuery.of(context).size.height - 450,
+                    height: MediaQuery.of(context).size.height - 510,
                     color: Colors.transparent,
                     child: SingleChildScrollView(
                       child: Column(
@@ -178,6 +183,25 @@ In no event, the developer of the application will be liable in any manner for a
                   ListTile(
                     title: Row(
                       children: [
+                        Icon(Icons.book, color: Colors.blue[900]),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          "Vaccine Dictionary (Beta)",
+                          style: TextStyle(color: Colors.blue[900]),
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => VaccEdPage()));
+                    },
+                  ),
+                  ListTile(
+                    title: Row(
+                      children: [
                         Icon(Icons.feedback, color: Colors.blue[900]),
                         SizedBox(
                           width: 10,
@@ -188,13 +212,11 @@ In no event, the developer of the application will be liable in any manner for a
                         ),
                       ],
                     ),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const FeedBack()),
-                      );
+                    onTap: () async {
+                      final InAppReview inAppReview = InAppReview.instance;
+                      inAppReview
+                          .openStoreListing()
+                          .then((value) => Navigator.of(context).pop());
                     },
                   ),
                   ListTile(
@@ -220,18 +242,28 @@ In no event, the developer of the application will be liable in any manner for a
                                   ButtonBar(
                                     children: [
                                       FlatButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: Text("Cancel")),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ),
                                       FlatButton(
+                                          color: Colors.red,
                                           onPressed: () async {
                                             Navigator.of(context).pop();
                                             await _auth.signOut();
                                           },
-                                          child: Text(
-                                            "Logout",
-                                            style: TextStyle(color: Colors.red),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Text(
+                                              "Logout",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15),
+                                            ),
                                           ))
                                     ],
                                   ),
@@ -291,34 +323,49 @@ In no event, the developer of the application will be liable in any manner for a
                         },
                         icon: Icon(Icons.search_rounded),
                       ),
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                              title: Text('Coming Soon...'),
-                              content: Text(
-                                  'Reminders and Educational content coming soon'),
-                              actions: [
-                                ButtonBar(
-                                  buttonPadding: EdgeInsets.all(0),
-                                  children: [
-                                    FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("OK"),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ));
-                  },
-                  icon: Icon(
-                    Icons.notifications_active,
-                    color: Colors.yellow,
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        notifCounter = 0;
+                      });
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                actionsPadding: EdgeInsets.all(0),
+                                title: Text('Coming Soon...'),
+                                content: Text('''
+1. Vaccination Reminders
+2. Family profiles'''),
+                                actions: [
+                                  ButtonBar(
+                                    buttonPadding: EdgeInsets.all(0),
+                                    children: [
+                                      FlatButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text("OK"),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ));
+                    },
+                    child: Badge(
+                      position: BadgePosition(top: 0, end: 0),
+                      toAnimate: true,
+                      showBadge: notifCounter > 0 ? true : false,
+                      animationType: BadgeAnimationType.slide,
+                      badgeContent: Text(
+                        '$notifCounter',
+                        style: TextStyle(color: Colors.white, fontSize: 8),
+                      ),
+                      child: Icon(Icons.notifications),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
             body: Padding(
@@ -408,25 +455,140 @@ In no event, the developer of the application will be liable in any manner for a
                                                           .data()
                                                           .toString()
                                                           .contains('imageUrl'))
-                                                      ? ConstrainedBox(
-                                                          constraints:
-                                                              BoxConstraints(
-                                                            maxHeight: 125,
-                                                            minHeight: 0,
+                                                      ? GestureDetector(
+                                                          child: ConstrainedBox(
+                                                            constraints:
+                                                                BoxConstraints(
+                                                              maxHeight: 135,
+                                                              minHeight: 0,
+                                                            ),
+                                                            child: Container(
+                                                              color: Colors
+                                                                  .amber[100],
+                                                              child: Image.network(
+                                                                  document[
+                                                                      'imageUrl']),
+                                                            ),
                                                           ),
-                                                          child: Container(
-                                                            color: Colors
-                                                                .amber[100],
-                                                            child: Image.network(
-                                                                document[
-                                                                    'imageUrl']),
-                                                          ),
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          ExpandedViewImage(
+                                                                    imageUrl:
+                                                                        document[
+                                                                            'imageUrl'],
+                                                                    vaccName:
+                                                                        document[
+                                                                            'vaccName'],
+                                                                  ),
+                                                                ));
+                                                          },
                                                         )
                                                       : Container(),
                                                   Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.end,
                                                     children: [
+                                                      // Padding(
+                                                      //   padding:
+                                                      //       const EdgeInsets
+                                                      //               .only(
+                                                      //           top: 10,
+                                                      //           right: 10,
+                                                      //           bottom: 5),
+                                                      //   child: FlatButton(
+                                                      //     minWidth: 0,
+                                                      //     color:
+                                                      //         Colors.blue[800],
+                                                      //     onPressed: () {
+                                                      //       showDialog(
+                                                      //         context: context,
+                                                      //         builder: (_) =>
+                                                      //             AlertDialog(
+                                                      //           shape:
+                                                      //               RoundedRectangleBorder(
+                                                      //             borderRadius:
+                                                      //                 BorderRadius
+                                                      //                     .circular(
+                                                      //                         12),
+                                                      //           ),
+                                                      //           title: Text(
+                                                      //               'Edit'),
+                                                      //           content:
+                                                      //               Container(
+                                                      //             child: Text(
+                                                      //                 'This action can not be undone.'),
+                                                      //           ),
+                                                      //           actions: [
+                                                      //             FlatButton(
+                                                      //               onPressed:
+                                                      //                   () {
+                                                      //                 Navigator.of(
+                                                      //                         context)
+                                                      //                     .pop(
+                                                      //                         false);
+                                                      //               },
+                                                      //               child: Text(
+                                                      //                 'Cancel',
+                                                      //                 style: TextStyle(
+                                                      //                     color: Colors
+                                                      //                         .blue,
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               ),
+                                                      //             ),
+                                                      //             FlatButton(
+                                                      //               color: Colors
+                                                      //                       .blue[
+                                                      //                   800],
+                                                      //               onPressed:
+                                                      //                   () {
+                                                      //                 Navigator
+                                                      //                     .push(
+                                                      //                   context,
+                                                      //                   MaterialPageRoute(
+                                                      //                     builder: (context) =>
+                                                      //                         EditVaccPage(
+                                                      //                       date:
+                                                      //                           document['date'],
+                                                      //                       doses:
+                                                      //                           document['doses'],
+                                                      //                       vaccName:
+                                                      //                           document['vaccName'],
+                                                      //                       imageUrl:
+                                                      //                           document['imageUrl'],
+                                                      //                     ),
+                                                      //                   ),
+                                                      //                 ).then((value) =>
+                                                      //                     Navigator.of(context)
+                                                      //                         .pop());
+                                                      //               },
+                                                      //               child: Text(
+                                                      //                 'Next',
+                                                      //                 style: TextStyle(
+                                                      //                     color: Colors
+                                                      //                         .white,
+                                                      //                     fontSize:
+                                                      //                         15),
+                                                      //               ),
+                                                      //             ),
+                                                      //             SizedBox(
+                                                      //               width: 5,
+                                                      //             ),
+                                                      //           ],
+                                                      //           elevation: 24,
+                                                      //         ),
+                                                      //       );
+                                                      //     },
+                                                      //     child: Icon(
+                                                      //       Icons.edit,
+                                                      //       color: Colors.white,
+                                                      //     ),
+                                                      //   ),
+                                                      // ),
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -436,6 +598,7 @@ In no event, the developer of the application will be liable in any manner for a
                                                                 bottom: 5),
                                                         child: FlatButton(
                                                           color: Colors.red,
+                                                          minWidth: 0,
                                                           onPressed: () {
                                                             showDialog(
                                                               context: context,
@@ -449,7 +612,7 @@ In no event, the developer of the application will be liable in any manner for a
                                                                               12),
                                                                 ),
                                                                 title: Text(
-                                                                    'Delete?'),
+                                                                    'Delete'),
                                                                 content:
                                                                     Container(
                                                                   child: Text(
@@ -478,7 +641,6 @@ In no event, the developer of the application will be liable in any manner for a
                                                                         .red,
                                                                     onPressed:
                                                                         () {
-                                                                      // delete vaccine record
                                                                       FirebaseFirestore
                                                                           .instance
                                                                           .collection(
@@ -528,12 +690,9 @@ In no event, the developer of the application will be liable in any manner for a
                                                               ),
                                                             );
                                                           },
-                                                          child: Text(
-                                                            'Delete',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 15),
+                                                          child: Icon(
+                                                            Icons.delete,
+                                                            color: Colors.white,
                                                           ),
                                                         ),
                                                       ),
@@ -661,6 +820,7 @@ In no event, the developer of the application will be liable in any manner for a
                 title: !isSearching
                     ? Text("VaxiCheck")
                     : TextField(
+                        autofocus: true,
                         onChanged: (val) {
                           initiateSearch(val);
                         },
@@ -688,10 +848,6 @@ In no event, the developer of the application will be liable in any manner for a
                         )
                       : Row(
                           children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.arrow_back_ios_rounded),
-                            ),
                             IconButton(
                               onPressed: () {
                                 setState(() {

@@ -75,8 +75,8 @@ class _NewVaccinePageState extends State<NewVaccinePage> {
   bool isGallery = true;
   bool isDummyFileUsed = false;
   bool isUploading = true;
-  String initValueText = "";
-  String initValueInt = "";
+  String initValueText = '';
+  String initValueInt = '';
 
   var firebaseUser = FirebaseAuth.instance.currentUser;
 
