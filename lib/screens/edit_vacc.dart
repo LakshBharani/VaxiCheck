@@ -24,6 +24,7 @@
 //   final String doses;
 //   final String date;
 //   final String imageUrl;
+
 //   @override
 //   State<EditVaccPage> createState() => _EditVaccPageState();
 // }
@@ -80,7 +81,7 @@
 //   final firestoreInstance = FirebaseFirestore.instance;
 //   final _formKey = GlobalKey<FormState>();
 //   bool loading = false;
-//   bool isImageAdded = false;
+//   bool isImageAdded = true;
 //   bool isGallery = true;
 //   bool isDummyFileUsed = false;
 //   bool isUploading = true;
@@ -97,11 +98,13 @@
 
 //   String vaccine = '';
 //   String doses = '';
-//   late String imageUrl;
 //   String error = '';
+//   String imageUrl = '';
 
 //   @override
 //   Widget build(BuildContext context) {
+//     imageUrl = widget.imageUrl;
+
 //     return loading
 //         ? Loading()
 //         : Scaffold(
@@ -217,41 +220,7 @@
 //                             color: Colors.white,
 //                             child: isImageAdded
 //                                 ? Image.network(imageUrl)
-//                                 : FlatButton(
-//                                     color: Colors.white,
-//                                     hoverColor: Colors.white,
-//                                     onPressed: () {
-//                                       showModalBottomSheet(
-//                                         context: context,
-//                                         builder: ((builder) => bottomSheet()),
-//                                       );
-//                                     },
-//                                     child: Column(
-//                                       crossAxisAlignment:
-//                                           CrossAxisAlignment.center,
-//                                       mainAxisAlignment:
-//                                           MainAxisAlignment.center,
-//                                       children: [
-//                                         SizedBox(
-//                                           child: Center(
-//                                             child: Icon(
-//                                               Icons.camera_alt,
-//                                               color: Colors.blue[800],
-//                                             ),
-//                                           ),
-//                                         ),
-//                                         SizedBox(
-//                                           height: 10,
-//                                         ),
-//                                         Text(
-//                                           'Please upload an image',
-//                                           style: TextStyle(
-//                                             fontWeight: FontWeight.bold,
-//                                           ),
-//                                         ),
-//                                       ],
-//                                     ),
-//                                   ),
+//                                 : Image.network(widget.imageUrl),
 //                           ),
 //                           SizedBox(
 //                             height: 25,

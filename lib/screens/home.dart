@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:in_app_review/in_app_review.dart';
-import 'package:vaxicheck/screens/edit_vacc.dart';
+// import 'package:vaxicheck/screens/edit_vacc.dart';
 import 'package:vaxicheck/screens/expanded_view_image.dart';
 import 'package:vaxicheck/screens/new_vacc.dart';
 import 'package:vaxicheck/screens/vacc_ed.dart';
@@ -451,10 +451,10 @@ In no event, the developer of the application will be liable in any manner for a
                                             children: [
                                               Column(
                                                 children: [
-                                                  (document
+                                                  document
                                                           .data()
                                                           .toString()
-                                                          .contains('imageUrl'))
+                                                          .contains('imageUrl')
                                                       ? GestureDetector(
                                                           child: ConstrainedBox(
                                                             constraints:
@@ -474,16 +474,17 @@ In no event, the developer of the application will be liable in any manner for a
                                                             Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          ExpandedViewImage(
-                                                                    imageUrl:
-                                                                        document[
-                                                                            'imageUrl'],
-                                                                    vaccName:
-                                                                        document[
-                                                                            'vaccName'],
-                                                                  ),
+                                                                  builder: (context) => ExpandedViewImage(
+                                                                      imageUrl:
+                                                                          document[
+                                                                              'imageUrl'],
+                                                                      vaccName:
+                                                                          document[
+                                                                              'vaccName'],
+                                                                      doses: document[
+                                                                          'doses'],
+                                                                      date: document[
+                                                                          'date']),
                                                                 ));
                                                           },
                                                         )
@@ -870,7 +871,7 @@ In no event, the developer of the application will be liable in any manner for a
                     primary: false,
                     shrinkWrap: true,
                     children: tempSearchStore.map((element) {
-                      return buildResultCard(element);
+                      return buildResultCard(element, context);
                     }).toList()),
               ),
             ),
@@ -879,41 +880,54 @@ In no event, the developer of the application will be liable in any manner for a
 }
 
 // search result card widget
-Widget buildResultCard(data) {
-  return Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-    elevation: 2,
-    child: Container(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(15, 15, 15, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                data['vaccName'],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  fontSize: 20,
+Widget buildResultCard(element, context) {
+  return GestureDetector(
+    child: Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 15, 15, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  element['vaccName'],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Record Found',
-              style: TextStyle(color: Colors.green[700]),
-            ),
-            SizedBox(
-              height: 5,
-            ),
-            Text('Go back to home for more details'),
-          ],
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Record Found',
+                style: TextStyle(color: Colors.green[700]),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text('Tap for more details'),
+            ],
+          ),
         ),
       ),
     ),
+    onTap: () {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ExpandedViewImage(
+                imageUrl: element['imageUrl'],
+                vaccName: element['vaccName'],
+                doses: element['doses'],
+                date: element['date']),
+          ));
+    },
   );
 }

@@ -59,8 +59,8 @@ android {
         applicationId "org.cubix.vaxicheck"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 5 
-        versionName "5"
+        versionCode 6
+        versionName "6"
         multiDexEnabled true
     }
 

@@ -2,10 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
-import 'expanded_view_image.dart';
 
 class VaccEdPage extends StatefulWidget {
   const VaccEdPage({Key? key}) : super(key: key);
@@ -88,23 +85,30 @@ class _VaccEdPageState extends State<VaccEdPage> {
                                   ],
                                 ),
                                 children: [
-                                  Text(
-                                    "About : " + document['about'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 14,
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "About : " + document['about'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  Text(
-                                    "Dosage : " + document['dosage'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 14,
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Dosage : " + document['dosage'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
+                                  SizedBox(height: 10),
                                   Column(
                                     children: [
                                       (document
@@ -123,19 +127,6 @@ class _VaccEdPageState extends State<VaccEdPage> {
                                                       document['imageUrl']),
                                                 ),
                                               ),
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ExpandedViewImage(
-                                                        imageUrl: document[
-                                                            'imageUrl'],
-                                                        vaccName:
-                                                            document['name'],
-                                                      ),
-                                                    ));
-                                              },
                                             )
                                           : Container(),
                                     ],
