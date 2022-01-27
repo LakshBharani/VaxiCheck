@@ -164,7 +164,7 @@ class _HomeState extends State<Home> {
                       showAboutDialog(
                           context: context,
                           applicationName: 'VaxiCheck',
-                          applicationVersion: '2.0.0',
+                          applicationVersion: '6.0.0',
                           applicationIcon: Container(
                             height: 40,
                             child: Image.asset('lib/assets/logo.png'),
