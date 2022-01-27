@@ -2,12 +2,12 @@
 Mobile app built using dart to keep track of your vaccinations
 
 # Screenshots
-<img src="https://user-images.githubusercontent.com/80910691/145515677-9fba7c5b-9fa8-44aa-86d9-c4797f56124f.png" height="600"></a>
-<img src="https://user-images.githubusercontent.com/80910691/145515703-2b610278-8f84-4caa-86c4-57380662ed61.png" height="600"></a>
-<img src="https://user-images.githubusercontent.com/80910691/145515795-a89fc85d-c89c-420f-8bd9-55a7db58ae0c.png" height="600"></a>
-<img src="https://user-images.githubusercontent.com/80910691/145516927-e2b1e5c9-7e95-4a44-93e9-edc3bce771b7.png" height="600"></a>
-<img src="https://user-images.githubusercontent.com/80910691/145516878-00ab4363-697b-456f-a320-17af02b39f81.png" height="600"></a>
-<img src="https://user-images.githubusercontent.com/80910691/136198133-173bc88d-8a8b-4fa9-97bd-6513865dac32.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421336-b13fdbc8-800b-47ce-b09a-25e0514ff160.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421686-111e0704-d0b3-4967-9232-a8da6444107e.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421733-1d3f5eed-39b9-45a7-988e-9aa380e4466b.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421884-123c54f3-f6ef-4bf6-b4d5-5ac257822e4a.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421618-528b029b-03b5-4cdd-9ee6-38a9babb5d06.png" height="600"></a>
+<img src="https://user-images.githubusercontent.com/80910691/151421580-c8949264-64ef-4b19-9962-1322df2609d3.png" height="600"></a>
 
 # Download Link
-https://drive.google.com/file/d/1luh2KhepopzpeCncaPIahIVTqsV4hXrI/view?usp=sharing
+https://play.google.com/store/apps/details?id=org.cubix.vaxicheck
